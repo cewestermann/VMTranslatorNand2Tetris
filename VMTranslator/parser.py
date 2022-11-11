@@ -53,7 +53,15 @@ class Command:
 
     @property
     def arg0(self):
-        return self.line[0]
+        return self.tokens[0]
+
+    @property
+    def arg1(self):
+        return self.tokens[1]
+
+    @property
+    def arg2(self):
+        return self.tokens[2]
 
 class Parser:
     def __init__(self, file):
@@ -84,12 +92,6 @@ class Parser:
             return command
         else:
             raise StopIteration
-
-    def command_type(self): return self.command.type
-
-    def arg1(self): return self.current_command[1]
-
-    def arg2(self): return self.current_command[2]
 
     def close(self): self.file.close()
 
