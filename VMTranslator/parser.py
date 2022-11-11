@@ -91,6 +91,8 @@ class Parser:
 
     def arg2(self): return self.current_command[2]
 
+    def close(self): self.file.close()
+
 
 if __name__ == '__main__':
     parser = Parser('../StackArithmetic/SimpleAdd/SimpleAdd.vm')
