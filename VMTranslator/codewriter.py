@@ -1,3 +1,4 @@
+from collections import deque, namedtuple
 from enum import Enum, auto
 from contextlib import contextmanager
 
@@ -14,23 +15,40 @@ _arithmetics = (
     'not'
 )
 
-SP = 0
-
 class CommandType:
     C_PUSH = auto()
     C_POP = auto()
 
-def increment_SP():
-    global SP
-    s = f'@{SP}\nM=M+1\n'
-    SP += 1
-    return s
+
+def register_ram_slot(address, value):
+    _registry.append(RAMSlot(address, value))
+
+RAMSlot = namedtuple('RAMSlot', ['address', 'value'])
+_registry = deque()
+
+
+class StackPointer:
+    def __init__(self):
+        self.address = 0
+        self.value = 256
+
+    def increment(self):
+        self.value += 1
+        return f'@{SP.address}\nM=M+1'
+
+    def decrement(self):
+        self.value -= 1
+        return f'@{SP.address}\nM=M-1'
+
+SP = StackPointer()
 
 def constant(value):
-   s1 = f'@{value}\nD=A\n' 
-   s2 = f'@{SP}\nA=M\nM=D\n'
-   s3 = increment_SP()
-   return s1 + s2 + s3
+    s1 = f'@{value}\nD=A\n' 
+    s2 = f'@{SP.address}\nA=M\nM=D\n'
+    s3 = SP.increment()
+    return s1 + s2 + s3
+
+def add(): pass
 
 _segments = {'constant': constant}
 
