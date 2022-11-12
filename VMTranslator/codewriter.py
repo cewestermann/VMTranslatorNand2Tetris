@@ -43,7 +43,7 @@ SP = StackPointer()
 def constant(value):
     s1 = f'@{value}\nD=A\n' 
     s2 = f'@{SP.address}\nA=M\nM=D\n'
-    register_ram_slot(SP.address, value)
+    register_ram_slot(SP.value, value)
     s3 = SP.increment()
     return s1 + s2 + s3
 
