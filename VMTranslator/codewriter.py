@@ -3,17 +3,15 @@ from enum import Enum, auto
 from contextlib import contextmanager
 
 
-_arithmetics = (
-    'add',
-    'sub',
-    'neg',
-    'eq',
-    'gt',
-    'lt',
-    'and',
-    'or',
-    'not'
-)
+#'add',
+#'sub',
+#'neg',
+#'eq',
+#'gt',
+#'lt',
+#'and',
+#'or',
+#'not'
 
 class CommandType:
     C_PUSH = auto()
@@ -34,21 +32,29 @@ class StackPointer:
 
     def increment(self):
         self.value += 1
-        return f'@{SP.address}\nM=M+1'
+        return f'@{SP.address}\nM=M+1\n'
 
     def decrement(self):
         self.value -= 1
-        return f'@{SP.address}\nM=M-1'
+        return f'@{SP.address}\nM=M-1\n'
 
 SP = StackPointer()
 
 def constant(value):
     s1 = f'@{value}\nD=A\n' 
     s2 = f'@{SP.address}\nA=M\nM=D\n'
+    register_ram_slot(SP.address, value)
     s3 = SP.increment()
     return s1 + s2 + s3
 
-def add(): pass
+def add(): 
+    slot1 = _registry.pop()
+    slot2 = _registry.pop()
+    s1 = f'@{slot1.address}\nD=M\n'
+    s2 = f'@{slot2.address}\nM=D+M\n'
+    register_ram_slot(slot2.address, slot1.value + slot2.value)
+    s3 = SP.decrement()
+    return s1 + s2 + s3
 
 _segments = {'constant': constant}
 
@@ -61,8 +67,14 @@ class CodeWriter:
     method_dict = {'push': push,
                    'pop': pop}
 
+    arithmetic_dict = {'add': add}
+
     def __init__(self, filename):
-        self.file = open(filename, 'w')
+        self.file = open(filename, 'a')
+
+    def write_arithmetic(self, command):
+        f = self.arithmetic_dict[command.arg0]
+        self.file.write(f())
 
     def write_push_pop(self, command):
         ctype, *args = command
@@ -86,3 +98,6 @@ if __name__ == '__main__':
     with new_codewriter('testfile.asm') as cw:
         string = Command('push constant 7'.split())
         cw.write_push_pop(string)
+        string = Command('push constant 8'.split())
+        cw.write_push_pop(string)
+        cw.write_arithmetic(Command('add'.split()))
