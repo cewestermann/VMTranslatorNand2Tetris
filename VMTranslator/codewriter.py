@@ -14,7 +14,7 @@ _arithmetics = (
     'not'
 )
 
-SP = 256
+SP = 0
 
 class CommandType:
     C_PUSH = auto()
