@@ -1,4 +1,4 @@
-from command import Command
+from .command import Command
 
 class EOF: pass
 end_of_file = EOF()

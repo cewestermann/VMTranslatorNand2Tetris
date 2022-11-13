@@ -1,6 +1,6 @@
 from contextlib import contextmanager
 
-from command import Command
+from .command import Command
 
 class StackPointer:
     def __init__(self):
