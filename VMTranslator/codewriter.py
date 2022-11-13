@@ -26,12 +26,45 @@ def constant(value):
     s3 = SP.increment()
     return comment + s1 + s2 + s3
 
+#_arithmetics = (
+#    'add',
+#    'sub',
+#    'neg',
+#    'eq',
+#    'gt',
+#    'lt',
+#    'and',
+#    'or',
+#    'not'
+#)
+
 def add(): 
     comment = '// add\n'
     s1 = f'@{SP.value - 1}\nD=M\n'
     s2 = f'@{SP.value - 2}\nM=D+M\n'
     s3 = SP.decrement()
     return comment + s1 + s2 + s3
+
+def sub():
+    comment = '// sub\n'
+    s1 = f'@{SP.value - 1}\nD=M\n'
+    s2 = f'@{SP.value - 2}\nM=D-M\n'
+    s3 = SP.decrement()
+    return comment + s1 + s2 + s3
+
+def neg():
+    comment = '// neg\n'
+    s1 = f'@{SP.value - 1}\nM=-M'
+    return comment + s1
+
+def eq():
+    comment = '// eq\n'
+    s1 = f'@{SP.value - 1}\nD=M\n'
+    s2 = f'@{SP.value - 2}\nM=D&M\n'
+    s3 = SP.decrement()
+    return comment + s1 + s2 + s3
+
+def gt(): pass
 
 _segments = {'constant': constant}
 
@@ -41,10 +74,18 @@ def push(segment, value):
 def pop(segment, value): pass
 
 class CodeWriter:
-    method_dict = {'push': push,
-                   'pop': pop}
+    method_dict = {
+        'push': push,
+        'pop': pop
+    }
 
-    arithmetic_dict = {'add': add}
+    arithmetic_dict = {
+        'add': add,
+        'sub': sub,
+        'neg': neg,
+        'eq': eq,
+
+    }
 
     def __init__(self, filename):
         self.file = open(filename, 'w')
@@ -76,11 +117,9 @@ def new_codewriter(filename):
         cw.close()
 
 if __name__ == '__main__':
-    from parser import Command
-
     with new_codewriter('testfile.asm') as cw:
         string = Command('push constant 7'.split())
         cw.write_command(string)
         string = Command('push constant 8'.split())
         cw.write_command(string)
-        cw.write_command(Command('add'.split()))
+        cw.write_command(Command('sub'.split()))

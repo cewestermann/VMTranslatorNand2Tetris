@@ -10,7 +10,6 @@ def translate(vmfile):
   with new_codewriter(f'{name}.asm') as cw:
     while True:
       command = parser.advance()
-      print(command)
       cw.write_command(command)
 
 if __name__ == '__main__':
