@@ -1,29 +1,6 @@
-from collections import deque, namedtuple
-from enum import Enum, auto
 from contextlib import contextmanager
 
-
-#'add',
-#'sub',
-#'neg',
-#'eq',
-#'gt',
-#'lt',
-#'and',
-#'or',
-#'not'
-
-class CommandType:
-    C_PUSH = auto()
-    C_POP = auto()
-
-
-def register_ram_slot(address, value):
-    _registry.append(RAMSlot(address, value))
-
-RAMSlot = namedtuple('RAMSlot', ['address', 'value'])
-_registry = deque()
-
+from command import Command
 
 class StackPointer:
     def __init__(self):
@@ -32,29 +9,29 @@ class StackPointer:
 
     def increment(self):
         self.value += 1
-        return f'@{SP.address}\nM=M+1\n'
+        comment = '// increment stack pointer\n'
+        return comment + f'@{SP.address}\nM=M+1\n'
 
     def decrement(self):
         self.value -= 1
-        return f'@{SP.address}\nM=M-1\n'
+        comment = '// decrement stack pointer\n'
+        return comment + f'@{SP.address}\nM=M-1\n'
 
 SP = StackPointer()
 
 def constant(value):
+    comment = f'// push constant {value}\n'
     s1 = f'@{value}\nD=A\n' 
     s2 = f'@{SP.address}\nA=M\nM=D\n'
-    register_ram_slot(SP.value, value)
     s3 = SP.increment()
-    return s1 + s2 + s3
+    return comment + s1 + s2 + s3
 
 def add(): 
-    slot1 = _registry.pop()
-    slot2 = _registry.pop()
-    s1 = f'@{slot1.address}\nD=M\n'
-    s2 = f'@{slot2.address}\nM=D+M\n'
-    register_ram_slot(slot2.address, slot1.value + slot2.value)
+    comment = '// add\n'
+    s1 = f'@{SP.value - 1}\nD=M\n'
+    s2 = f'@{SP.value - 2}\nM=D+M\n'
     s3 = SP.decrement()
-    return s1 + s2 + s3
+    return comment + s1 + s2 + s3
 
 _segments = {'constant': constant}
 
@@ -70,16 +47,22 @@ class CodeWriter:
     arithmetic_dict = {'add': add}
 
     def __init__(self, filename):
-        self.file = open(filename, 'a')
+        self.file = open(filename, 'w')
 
-    def write_arithmetic(self, command):
+    def _write_arithmetic(self, command):
         f = self.arithmetic_dict[command.arg0]
         self.file.write(f())
 
-    def write_push_pop(self, command):
+    def _write_push_pop(self, command):
         ctype, *args = command
         f = self.method_dict[ctype]
         self.file.write(f(*args))
+
+    def write_command(self, command):
+        if command.type.value == 'push':
+            self._write_push_pop(command)
+        else:
+            self._write_arithmetic(command)
 
     def close(self):
         self.file.close()
@@ -97,7 +80,7 @@ if __name__ == '__main__':
 
     with new_codewriter('testfile.asm') as cw:
         string = Command('push constant 7'.split())
-        cw.write_push_pop(string)
+        cw.write_command(string)
         string = Command('push constant 8'.split())
-        cw.write_push_pop(string)
-        cw.write_arithmetic(Command('add'.split()))
+        cw.write_command(string)
+        cw.write_command(Command('add'.split()))
