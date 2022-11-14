@@ -1,3 +1,4 @@
+from functools import wraps
 from contextlib import contextmanager
 
 from .command import Command
@@ -34,6 +35,16 @@ SP = StackPointer()
 
 class VMCommand: pass
 
+
+def decrement_sp_on_call(f):
+  @wraps(f)
+  def wrapper(*args, **kwargs):
+    res = f(*args, **kwargs)
+    SP.decrement()
+    return res
+  return wrapper
+
+
 class LogicalVMCommand(VMCommand):
   def __init__(self):
     self.labelcount = 0
@@ -42,12 +53,39 @@ class Eq(LogicalVMCommand):
     def __init__(self):
         super().__init__()
 
-    def __call__(self, value):
-        comment = f'// push constant {value}\n'
-        s1 = f'@{value}\nD=A\n' 
-        s2 = f'@{SP.address}\nA=M\nM=D\n'
-        s3 = SP.increment()
-        return comment + s1 + s2 + s3
+    @decrement_sp_on_call
+    def __call__(self):
+        return (
+          '// eq\n'
+         f'@{SP.value - 1}\n'
+          'D=M\n'
+         f'@{SP.value - 2}\n'
+          'D=D-M\n'
+         f'@EQ{self.labelcount}\n'
+          'D;JNE\n'
+          '// if equal:\n'
+          '@{SP.value - 2}\n'
+          'M=-1\n'
+         f'(EQ{self.labelcount})\n'
+          '// if not equal\n'
+         f'@{SP.value - 2}\n'
+          'M=1\n'
+        )
+
+class Gt(LogicalVMCommand):
+    def __init__(self):
+        super().__init__()
+
+    def __call__(self):
+        return ()
+
+
+
+
+
+
+
+
 
 
 
