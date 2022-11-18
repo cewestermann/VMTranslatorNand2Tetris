@@ -33,9 +33,6 @@ class StackPointer:
 SP = StackPointer()
 
 
-class VMCommand: pass
-
-
 def decrement_sp_on_call(f):
   @wraps(f)
   def wrapper(*args, **kwargs):
@@ -44,10 +41,38 @@ def decrement_sp_on_call(f):
     return res
   return wrapper
 
+class VMCommand: pass
 
 class LogicalVMCommand(VMCommand):
-  def __init__(self):
-    self.labelcount = 0
+    def __init__(self):
+        self.labelcount = 0
+
+    @staticmethod
+    def _compare_op():
+        return (
+           f'@{SP.value - 1}\n'
+            'D=M\n'
+           f'@{SP.value - 2}\n'
+            'D=D-M\n'
+        )
+
+    def _condition_result(self):
+        return (
+            f'@{SP.value - 2}\n'
+             'M=1\n'
+            f'({self._clslabel}{self.labelcount})\n'
+            f'// if not {self._clslabel}\n'
+            f'@{SP.value - 2}\n'
+             'M=-1\n'
+        )
+
+    @property
+    def _clslabel(self):
+        return f'{type(self).__name__.upper()}'
+
+    def _put_label_reference(self):
+        return f'@{self._clslabel}{self.labelcount}\n'
+
 
 class Eq(LogicalVMCommand):
     def __init__(self):
@@ -55,39 +80,43 @@ class Eq(LogicalVMCommand):
 
     @decrement_sp_on_call
     def __call__(self):
-        return (
-          '// eq\n'
-         f'@{SP.value - 1}\n'
-          'D=M\n'
-         f'@{SP.value - 2}\n'
-          'D=D-M\n'
-         f'@EQ{self.labelcount}\n'
-          'D;JNE\n'
-          '// if equal:\n'
-          '@{SP.value - 2}\n'
-          'M=-1\n'
-         f'(EQ{self.labelcount})\n'
-          '// if not equal\n'
-         f'@{SP.value - 2}\n'
-          'M=1\n'
-        )
+        text = '// eq\n' + self._compare_op()
+        text += ('// eq\n'
+                f'@EQ{self.labelcount}\n'
+                 'D;JNE\n'
+                 '// if equal:\n')
+        text += self._condition_result()
+
+
+
+
+#                      f'@{SP.value - 2}\n'
+#                       'M=1\n'
+#                      f'(EQ{self.labelcount})\n'
+#                       '// if not equal\n'
+#                      f'@{SP.value - 2}\n'
+#                       'M=1\n'
+        self.labelcount += 1
+        return text
 
 class Gt(LogicalVMCommand):
     def __init__(self):
         super().__init__()
 
     def __call__(self):
-        return ()
-
-
-
-
-
-
-
-
-
-
+        text = (
+          '// lt\n'
+         f'@{SP.value - 1}\n'
+          'D=M\n'
+         f'@{SP.value - 2}\n'
+          'D=D-M\n'
+         f'@GT{self.labelcount}\n'
+          'D;JLT\n'
+          '// if less than\n'
+         f'@{SP.value - 2}\n'
+          'M=1\n'
+          )
+        return text
 
 
 def constant(value):
@@ -117,15 +146,6 @@ def neg():
     s1 = f'@{SP.value - 1}\nM=-M'
     return comment + s1
 
-def eq():
-    comment = '// eq\n'
-    s1 = f'@{SP.value - 1}\nD=M\n'
-    s2 = f'@{SP.value - 2}\nM=D&M\n'
-    s3 = SP.decrement()
-    return comment + s1 + s2 + s3
-
-def gt(): pass
-
 _segments = {'constant': constant}
 
 def push(segment, value):
@@ -143,7 +163,7 @@ class CodeWriter:
         'add': add,
         'sub': sub,
         'neg': neg,
-        'eq': eq,
+        'eq': Eq(),
 
     }
 

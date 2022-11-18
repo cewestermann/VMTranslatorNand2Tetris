@@ -20,10 +20,16 @@ M=M+1
 @257
 D=M
 @256
-M=D&M
-// decrement stack pointer
-@0
-M=M-1
+D=D-M
+@EQ0
+D;JNE
+// if equal:
+@256
+M=-1
+(EQ0)
+// if not equal
+@256
+M=1
 // push constant 17
 @17
 D=A
@@ -46,10 +52,16 @@ M=M+1
 @258
 D=M
 @257
-M=D&M
-// decrement stack pointer
-@0
-M=M-1
+D=D-M
+@EQ1
+D;JNE
+// if equal:
+@257
+M=-1
+(EQ1)
+// if not equal
+@257
+M=1
 // push constant 16
 @16
 D=A
@@ -72,10 +84,16 @@ M=M+1
 @259
 D=M
 @258
-M=D&M
-// decrement stack pointer
-@0
-M=M-1
+D=D-M
+@EQ2
+D;JNE
+// if equal:
+@258
+M=-1
+(EQ2)
+// if not equal
+@258
+M=1
 // push constant 892
 @892
 D=A
