@@ -158,6 +158,8 @@ class CodeWriter:
         'sub': sub,
         'neg': neg,
         'eq': Eq(),
+        'lt': Lt(),
+        'gt': Gt(),
 
     }
 
