@@ -3,18 +3,6 @@ from contextlib import contextmanager
 
 from .command import Command
 
-#_arithmetics = (
-#    'add',
-#    'sub',
-#    'neg',
-#    'eq',
-#    'gt',
-#    'lt',
-#    'and',
-#    'or',
-#    'not'
-#)
-
 class StackPointer:
     def __init__(self):
         self.address = 0
@@ -30,8 +18,8 @@ class StackPointer:
         comment = '// decrement stack pointer\n'
         return comment + f'@{SP.address}\nM=M-1\n'
 
-SP = StackPointer()
 
+SP = StackPointer()
 
 def decrement_sp_on_call(f):
   @wraps(f)
@@ -43,7 +31,7 @@ def decrement_sp_on_call(f):
 
 class VMCommand: pass
 
-class LogicalVMCommand(VMCommand):
+class BooleanVMCommand(VMCommand):
     def __init__(self):
         self.labelcount = 0
 
@@ -57,66 +45,73 @@ class LogicalVMCommand(VMCommand):
         )
 
     def _condition_result(self):
-        return (
+        text = (
+            f'// if {self._clslabel}\n'
             f'@{SP.value - 2}\n'
-             'M=1\n'
-            f'({self._clslabel}{self.labelcount})\n'
-            f'// if not {self._clslabel}\n'
-            f'@{SP.value - 2}\n'
-             'M=-1\n'
+             'M=-1\n' # Word of ones (true)
         )
+        text += self._put_end_label_reference()
+        text += self._put_uncond_jump()
+        text += self._put_label()
+        text += f'// if not {self._clslabel}\n'
+        text += f'@{SP.value - 2}\n'
+        text +=  'M=0\n'
+        return text
 
     @property
     def _clslabel(self):
         return f'{type(self).__name__.upper()}'
 
+    @staticmethod
+    def _put_uncond_jump():
+        return f'0;JMP\n'
+
     def _put_label_reference(self):
         return f'@{self._clslabel}{self.labelcount}\n'
 
+    def _put_label(self):
+        return f'{self._put_label_reference()[1:]}\n'
 
-class Eq(LogicalVMCommand):
+    def _put_end_label_reference(self):
+        return f'@END_{self._clslabel}{self.labelcount}\n'
+
+    def _put_end_label(self):
+        return f'({self._put_end_label_reference()[1:]})\n'
+
+    def _assemble_boolean(self, jump_cond):
+        text = f'// {self._clslabel}\n'
+        text += self._compare_op()
+        text += self._put_label_reference()
+        text += jump_cond
+        text += self._condition_result()
+
+        self.labelcount += 1
+        return text
+
+
+class Eq(BooleanVMCommand):
     def __init__(self):
         super().__init__()
 
     @decrement_sp_on_call
     def __call__(self):
-        text = '// eq\n' + self._compare_op()
-        text += ('// eq\n'
-                f'@EQ{self.labelcount}\n'
-                 'D;JNE\n'
-                 '// if equal:\n')
-        text += self._condition_result()
+        return self._assemble_boolean('D;JNE\n')
 
 
-
-
-#                      f'@{SP.value - 2}\n'
-#                       'M=1\n'
-#                      f'(EQ{self.labelcount})\n'
-#                       '// if not equal\n'
-#                      f'@{SP.value - 2}\n'
-#                       'M=1\n'
-        self.labelcount += 1
-        return text
-
-class Gt(LogicalVMCommand):
+class Gt(BooleanVMCommand):
     def __init__(self):
         super().__init__()
 
     def __call__(self):
-        text = (
-          '// lt\n'
-         f'@{SP.value - 1}\n'
-          'D=M\n'
-         f'@{SP.value - 2}\n'
-          'D=D-M\n'
-         f'@GT{self.labelcount}\n'
-          'D;JLT\n'
-          '// if less than\n'
-         f'@{SP.value - 2}\n'
-          'M=1\n'
-          )
-        return text
+        return self._assemble_boolean('D;JLT\n')
+
+
+class Lt(BooleanVMCommand):
+    def __init__(self):
+        super().__init__()
+
+    def __call__(self):
+        return self._assemble_boolean('D:JGT\n')
 
 
 def constant(value):
@@ -125,7 +120,6 @@ def constant(value):
     s2 = f'@{SP.address}\nA=M\nM=D\n'
     s3 = SP.increment()
     return comment + s1 + s2 + s3
-
 
 def add(): 
     comment = '// add\n'
