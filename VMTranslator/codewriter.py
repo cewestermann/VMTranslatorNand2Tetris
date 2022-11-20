@@ -48,17 +48,29 @@ class BooleanVMCommand(VMCommand):
         )
 
     def _condition_result(self):
+        # True part
+        text = self._true_branch()
+        text += self._put_end_label_reference()
+        text += self._put_uncond_jump()
+
+        # False part
+        text += self._put_label()
+        text += self._false_branch()
+        text += self._put_end_label()
+        return text
+
+    def _false_branch(self):
+        text =  f'// if not {self._clslabel}\n'
+        text += f'@{SP.value - 2}\n'
+        text +=  'M=0\n'
+        return text
+
+    def _true_branch(self):
         text = (
             f'// if {self._clslabel}\n'
             f'@{SP.value - 2}\n'
              'M=-1\n' # Word of ones (true)
         )
-        text += self._put_end_label_reference()
-        text += self._put_uncond_jump()
-        text += self._put_label()
-        text += f'// if not {self._clslabel}\n'
-        text += f'@{SP.value - 2}\n'
-        text +=  'M=0\n'
         return text
 
     @property
@@ -73,13 +85,13 @@ class BooleanVMCommand(VMCommand):
         return f'@{self._clslabel}{self.labelcount}\n'
 
     def _put_label(self):
-        return f'{self._put_label_reference()[1:]}\n'
+        return f'({self._clslabel}{self.labelcount})\n'
 
     def _put_end_label_reference(self):
         return f'@END_{self._clslabel}{self.labelcount}\n'
 
     def _put_end_label(self):
-        return f'({self._put_end_label_reference()[1:]})\n'
+        return f'(END_{self._clslabel}{self.labelcount})\n'
 
     def _assemble_boolean(self, jump_cond):
         text = f'// {self._clslabel}\n'
@@ -116,7 +128,7 @@ class Lt(BooleanVMCommand):
 
     @decrement_sp_on_call
     def __call__(self):
-        return self._assemble_boolean('D:JGT\n')
+        return self._assemble_boolean('D;JGT\n')
 
 
 def constant(value):
@@ -163,7 +175,6 @@ class CodeWriter:
         'eq': Eq(),
         'lt': Lt(),
         'gt': Gt(),
-
     }
 
     def __init__(self, filename):
