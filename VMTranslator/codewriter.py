@@ -26,8 +26,7 @@ def decrement_sp_on_call(f):
   @wraps(f)
   def wrapper(*args, **kwargs):
     res = f(*args, **kwargs)
-    SP.decrement()
-    return res
+    return res + SP.decrement()
   return wrapper
 
 
