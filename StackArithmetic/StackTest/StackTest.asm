@@ -33,6 +33,9 @@ M=-1
 @256
 M=0
 (END_EQ0)
+// decrement stack pointer
+@0
+M=M-1
 // push constant 17
 @17
 D=A
@@ -68,6 +71,9 @@ M=-1
 @257
 M=0
 (END_EQ1)
+// decrement stack pointer
+@0
+M=M-1
 // push constant 16
 @16
 D=A
@@ -103,6 +109,9 @@ M=-1
 @258
 M=0
 (END_EQ2)
+// decrement stack pointer
+@0
+M=M-1
 // push constant 892
 @892
 D=A
@@ -138,6 +147,9 @@ M=-1
 @259
 M=0
 (END_LT0)
+// decrement stack pointer
+@0
+M=M-1
 // push constant 891
 @891
 D=A
@@ -173,6 +185,9 @@ M=-1
 @260
 M=0
 (END_LT1)
+// decrement stack pointer
+@0
+M=M-1
 // push constant 891
 @891
 D=A
@@ -208,6 +223,9 @@ M=-1
 @261
 M=0
 (END_LT2)
+// decrement stack pointer
+@0
+M=M-1
 // push constant 32767
 @32767
 D=A
@@ -243,6 +261,9 @@ M=-1
 @262
 M=0
 (END_GT0)
+// decrement stack pointer
+@0
+M=M-1
 // push constant 32766
 @32766
 D=A
@@ -278,6 +299,9 @@ M=-1
 @263
 M=0
 (END_GT1)
+// decrement stack pointer
+@0
+M=M-1
 // push constant 32766
 @32766
 D=A
@@ -313,6 +337,9 @@ M=-1
 @264
 M=0
 (END_GT2)
+// decrement stack pointer
+@0
+M=M-1
 // push constant 57
 @57
 D=A
