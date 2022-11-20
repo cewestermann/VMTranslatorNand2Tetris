@@ -3,6 +3,7 @@ from contextlib import contextmanager
 
 from .command import Command
 
+
 class StackPointer:
     def __init__(self):
         self.address = 0
@@ -29,7 +30,9 @@ def decrement_sp_on_call(f):
     return res
   return wrapper
 
+
 class VMCommand: pass
+
 
 class BooleanVMCommand(VMCommand):
     def __init__(self):
@@ -102,6 +105,7 @@ class Gt(BooleanVMCommand):
     def __init__(self):
         super().__init__()
 
+    @decrement_sp_on_call
     def __call__(self):
         return self._assemble_boolean('D;JLT\n')
 
@@ -110,6 +114,7 @@ class Lt(BooleanVMCommand):
     def __init__(self):
         super().__init__()
 
+    @decrement_sp_on_call
     def __call__(self):
         return self._assemble_boolean('D:JGT\n')
 
@@ -145,12 +150,10 @@ _segments = {'constant': constant}
 def push(segment, value):
     return _segments[segment](value)
 
-def pop(segment, value): pass
 
 class CodeWriter:
     method_dict = {
         'push': push,
-        'pop': pop
     }
 
     arithmetic_dict = {
@@ -184,6 +187,7 @@ class CodeWriter:
     def close(self):
         self.file.close()
 
+
 @contextmanager
 def new_codewriter(filename):
     cw = CodeWriter(filename)
@@ -192,6 +196,7 @@ def new_codewriter(filename):
     finally:
         cw.close()
 
+
 if __name__ == '__main__':
     with new_codewriter('testfile.asm') as cw:
         string = Command('push constant 7'.split())
@@ -199,3 +204,5 @@ if __name__ == '__main__':
         string = Command('push constant 8'.split())
         cw.write_command(string)
         cw.write_command(Command('sub'.split()))
+
+
