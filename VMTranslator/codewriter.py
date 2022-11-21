@@ -33,9 +33,13 @@ def decrement_sp_on_call(f):
 class VMCommand: pass
 
 
-class BooleanVMCommand(VMCommand):
+class LogicalVMCommand(VMCommand):
     def __init__(self):
         self.labelcount = 0
+
+    def __init_subclass__(cls):
+        super().__init_subclass__()
+        cls.__call__ = decrement_sp_on_call(cls.__call__)
 
     @staticmethod
     def _compare_op():
@@ -45,6 +49,10 @@ class BooleanVMCommand(VMCommand):
            f'@{SP.value - 2}\n'
             'D=D-M\n'
         )
+
+    @property
+    def _clslabel(self):
+        return f'{type(self).__name__.upper()}'
 
     def _condition_result(self):
         # True part
@@ -71,10 +79,6 @@ class BooleanVMCommand(VMCommand):
              'M=-1\n' # Word of ones (true)
         )
         return text
-
-    @property
-    def _clslabel(self):
-        return f'{type(self).__name__.upper()}'
 
     @staticmethod
     def _put_uncond_jump():
@@ -103,31 +107,51 @@ class BooleanVMCommand(VMCommand):
         return text
 
 
-class Eq(BooleanVMCommand):
+class Eq(LogicalVMCommand):
     def __init__(self):
         super().__init__()
 
-    @decrement_sp_on_call
     def __call__(self):
         return self._assemble_boolean('D;JNE\n')
 
 
-class Gt(BooleanVMCommand):
+class Gt(LogicalVMCommand):
     def __init__(self):
         super().__init__()
 
-    @decrement_sp_on_call
     def __call__(self):
         return self._assemble_boolean('D;JLT\n')
 
 
-class Lt(BooleanVMCommand):
+class Lt(LogicalVMCommand):
     def __init__(self):
         super().__init__()
 
-    @decrement_sp_on_call
     def __call__(self):
         return self._assemble_boolean('D;JGT\n')
+
+
+class And(LogicalVMCommand):
+    def __init__(self):
+        super().__init__()
+
+    def __call__(self):
+        comment = '// and\n'
+        text = comment + f'@{SP.value - 1}\nD=M+1\n'
+        text += f'@FALSEBRANCH_{self._clslabel}{self.labelcount}'
+        text +=  'D;JNE' # If first value is not -1 (true), jump to false branch
+
+        text += f'@{SP.value - 2}\nD=M+1\n'
+        text += f'@FALSEBRANCH_{self._clslabel}{self.labelcount}'
+        text +=  'D;JNE' # If second value is not -1 (true), jump to false branch
+
+        # Else, both are true and result is -1 (true)
+        text += f'@{SP.value - 2}\n'
+        text += 'M=-1\n'
+
+        text += self._put_end_label_reference()
+        text += self._put_uncond_jump()
+        
 
 
 def constant(value):
