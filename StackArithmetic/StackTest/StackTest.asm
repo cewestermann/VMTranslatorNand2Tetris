@@ -394,4 +394,32 @@ M=D-M
 M=M-1
 // neg
 @266
-M=-M
+M=-M// and
+@266
+D=M+1
+@FALSEBRANCH_AND0
+D;JNE
+@265
+D=M+1
+@FALSEBRANCH_AND0
+D;JNE
+@265
+M=-1
+@END_AND0
+0;JMP
+(FALSEBRANCH_AND0)
+@265
+M=0
+(END_AND0)
+// decrement stack pointer
+@0
+M=M-1
+// push constant 82
+@82
+D=A
+@0
+A=M
+M=D
+// increment stack pointer
+@0
+M=M+1

@@ -138,12 +138,12 @@ class And(LogicalVMCommand):
     def __call__(self):
         comment = '// and\n'
         text = comment + f'@{SP.value - 1}\nD=M+1\n'
-        text += f'@FALSEBRANCH_{self._clslabel}{self.labelcount}'
-        text +=  'D;JNE' # If first value is not -1 (true), jump to false branch
+        text += f'@FALSEBRANCH_{self._clslabel}{self.labelcount}\n'
+        text +=  'D;JNE\n' # If first value is not -1 (true), jump to false branch
 
         text += f'@{SP.value - 2}\nD=M+1\n'
-        text += f'@FALSEBRANCH_{self._clslabel}{self.labelcount}'
-        text +=  'D;JNE' # If second value is not -1 (true), jump to false branch
+        text += f'@FALSEBRANCH_{self._clslabel}{self.labelcount}\n'
+        text +=  'D;JNE\n' # If second value is not -1 (true), jump to false branch
 
         # Else, both are true and result is -1 (true)
         text += f'@{SP.value - 2}\n'
@@ -151,7 +151,25 @@ class And(LogicalVMCommand):
 
         text += self._put_end_label_reference()
         text += self._put_uncond_jump()
-        
+
+        text += f'(FALSEBRANCH_{self._clslabel}{self.labelcount})\n'
+        text += f'@{SP.value - 2}\n'
+        text += 'M=0\n'
+
+        text += self._put_end_label()
+
+        self.labelcount += 1
+        return text
+
+
+class Or(LogicalVMCommand):
+    def __init__(self):
+        super().__init__()
+
+    def __call__(self):
+        comment = '// or\n'
+        text = comment + f'@{SP.value - 1}\nD=M+1\n'
+
 
 
 def constant(value):
@@ -198,6 +216,7 @@ class CodeWriter:
         'eq': Eq(),
         'lt': Lt(),
         'gt': Gt(),
+        'and': And(),
     }
 
     def __init__(self, filename):
