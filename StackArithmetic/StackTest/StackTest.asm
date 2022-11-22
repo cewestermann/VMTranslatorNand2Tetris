@@ -423,3 +423,23 @@ M=D
 // increment stack pointer
 @0
 M=M+1
+// or
+@265
+D=M+1
+@TRUEBRANCH_OR0
+D;JEQ
+@265
+M=0
+@END_OR0
+0;JMP
+(TRUEBRANCH_OR0)
+@265
+M=-1
+(END_OR0)
+// decrement stack pointer
+@0
+M=M-1
+// not
+@265
+D=M
+M=!D

@@ -39,7 +39,9 @@ class LogicalVMCommand(VMCommand):
 
     def __init_subclass__(cls):
         super().__init_subclass__()
-        cls.__call__ = decrement_sp_on_call(cls.__call__)
+        breakpoint()
+        if cls.__name__ != 'Not':
+            cls.__call__ = decrement_sp_on_call(cls.__call__)
 
     @staticmethod
     def _compare_op():
@@ -201,9 +203,10 @@ class Not(LogicalVMCommand):
     def __call__(self):
         comment = '// not\n'
         text = comment + f'@{SP.value - 1}\nD=M\n'
+        text += 'M=!D\n'
 
-        # If D = -1 -> D = 0
-
+        self.labelcount += 1
+        return text
 
 
 def constant(value):
@@ -251,6 +254,8 @@ class CodeWriter:
         'lt': Lt(),
         'gt': Gt(),
         'and': And(),
+        'or': Or(),
+        'not': Not()
     }
 
     def __init__(self, filename):
