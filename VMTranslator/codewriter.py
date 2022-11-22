@@ -154,7 +154,7 @@ class And(LogicalVMCommand):
 
         text += f'(FALSEBRANCH_{self._clslabel}{self.labelcount})\n'
         text += f'@{SP.value - 2}\n'
-        text += 'M=0\n'
+        text +=  'M=0\n'
 
         text += self._put_end_label()
 
@@ -169,6 +169,25 @@ class Or(LogicalVMCommand):
     def __call__(self):
         comment = '// or\n'
         text = comment + f'@{SP.value - 1}\nD=M+1\n'
+        text += f'@TRUEBRANCH_{self._clslabel}{self.labelcount}\n'
+        text +=  'D;JEQ\n' # If value is true, jump to true branch
+
+        text = comment + f'@{SP.value - 2}\nD=M+1\n'
+        text += f'@TRUEBRANCH_{self._clslabel}{self.labelcount}\n'
+        text +=  'D;JEQ\n' # If value is true, jump to true branch
+
+        # Else, it's false
+        text += f'@{SP.value - 2}\n'
+        text +=  'M=0\n'
+
+        text += self._put_end_label_reference()
+        text += self._put_uncond_jump()
+
+        # True branch
+        text += f'(TRUEBRANCH_{self._clslabel}{self.labelcount})\n'
+        text += f'@{SP.value - 2}\n'
+        text +=  'M=-1\n'
+
 
 
 
