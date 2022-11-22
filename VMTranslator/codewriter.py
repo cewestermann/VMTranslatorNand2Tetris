@@ -188,6 +188,21 @@ class Or(LogicalVMCommand):
         text += f'@{SP.value - 2}\n'
         text +=  'M=-1\n'
 
+        text += self._put_end_label()
+        
+        self.labelcount += 1
+        return text
+
+
+class Not(LogicalVMCommand):
+    def __init__(self):
+        super().__init__()
+
+    def __call__(self):
+        comment = '// not\n'
+        text = comment + f'@{SP.value - 1}\nD=M\n'
+
+        # If D = -1 -> D = 0
 
 
 
