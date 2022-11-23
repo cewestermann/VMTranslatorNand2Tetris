@@ -1,14 +1,14 @@
 from functools import wraps
 from contextlib import contextmanager
-from enum import Enum
+from collections import namedtuple
 
 from .command import Command
 
 
-class Pointer:
-    def __init__(self, address, value):
-        self.address = address
-        self.value = value
+class StackPointer:
+    def __init__(self):
+        self.address = 0
+        self.value = 256
 
     def increment(self):
         self.value += 1
@@ -22,8 +22,8 @@ class Pointer:
         return f'// increment {type(self).__name__}\n'
 
 
-SP = Pointer(0, 256)
-LCL = Pointer(1, 300)
+SP = StackPointer()
+
 
 def decrement_sp_on_call(f):
   @wraps(f)
@@ -191,6 +191,14 @@ def neg():
     return comment + s1
 
 
+Segment = namedtuple('Segment', ['address', 'base'])
+
+LCL = Segment(1, 300)
+ARG = Segment(2, 400)
+THIS = Segment(3, 3000)
+THAT = Segment(4, 3010)
+
+
 class PushVMCommand(VMCommand):
     @staticmethod
     def constant(value):
@@ -216,34 +224,35 @@ def pushpop(obj, segment, value):
     return getattr(obj, segment)(value)
 
 
+_method_dict = {
+    'push': PushVMCommand,
+    'pop': pushpop,
+}
+
+_arithmetic_dict = {
+    'add': add,
+    'sub': sub,
+    'neg': neg,
+    'eq': Eq(),
+    'lt': Lt(),
+    'gt': Gt(),
+    'and': And(),
+    'or': Or(),
+    'not': Not()
+}
+
+
 class CodeWriter:
-    method_dict = {
-        'push': PushVMCommand,
-        'pop': pushpop,
-    }
-
-    arithmetic_dict = {
-        'add': add,
-        'sub': sub,
-        'neg': neg,
-        'eq': Eq(),
-        'lt': Lt(),
-        'gt': Gt(),
-        'and': And(),
-        'or': Or(),
-        'not': Not()
-    }
-
     def __init__(self, filename):
         self.file = open(filename, 'w')
 
     def _write_arithmetic(self, command):
-        f = self.arithmetic_dict[command.arg0]
+        f = _arithmetic_dict[command.arg0]
         self.file.write(f())
 
     def _write_push_pop(self, command):
         ctype, *args = command
-        obj = self.method_dict[ctype]
+        obj = _method_dict[ctype]
         self.file.write(pushpop(obj, *args))
 
     def write_command(self, command):
