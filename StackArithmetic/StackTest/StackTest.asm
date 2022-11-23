@@ -136,7 +136,7 @@ D=M
 @259
 D=D-M
 @LT0
-D;JGT
+D-1;JLT
 // if LT
 @259
 M=-1
@@ -174,7 +174,7 @@ D=M
 @260
 D=D-M
 @LT1
-D;JGT
+D-1;JLT
 // if LT
 @260
 M=-1
@@ -212,7 +212,7 @@ D=M
 @261
 D=D-M
 @LT2
-D;JGT
+D-1;JLT
 // if LT
 @261
 M=-1
@@ -250,7 +250,7 @@ D=M
 @262
 D=D-M
 @GT0
-D;JLT
+D+1;JGT
 // if GT
 @262
 M=-1
@@ -288,7 +288,7 @@ D=M
 @263
 D=D-M
 @GT1
-D;JLT
+D+1;JGT
 // if GT
 @263
 M=-1
@@ -326,7 +326,7 @@ D=M
 @264
 D=D-M
 @GT2
-D;JLT
+D+1;JGT
 // if GT
 @264
 M=-1
@@ -388,7 +388,7 @@ M=M+1
 @267
 D=M
 @266
-M=D-M
+M=M-D
 // decrement stack pointer
 @0
 M=M-1
@@ -396,21 +396,9 @@ M=M-1
 @266
 M=-M// and
 @266
-D=M+1
-@FALSEBRANCH_AND0
-D;JNE
+D=M
 @265
-D=M+1
-@FALSEBRANCH_AND0
-D;JNE
-@265
-M=-1
-@END_AND0
-0;JMP
-(FALSEBRANCH_AND0)
-@265
-M=0
-(END_AND0)
+M=D&M
 // decrement stack pointer
 @0
 M=M-1
@@ -424,22 +412,13 @@ M=D
 @0
 M=M+1
 // or
+@266
+D=M
 @265
-D=M+1
-@TRUEBRANCH_OR0
-D;JEQ
-@265
-M=0
-@END_OR0
-0;JMP
-(TRUEBRANCH_OR0)
-@265
-M=-1
-(END_OR0)
+M=D|M
 // decrement stack pointer
 @0
 M=M-1
 // not
 @265
-D=M
-M=!D
+M=!M

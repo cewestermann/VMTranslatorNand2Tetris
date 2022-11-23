@@ -39,7 +39,6 @@ class LogicalVMCommand(VMCommand):
 
     def __init_subclass__(cls):
         super().__init_subclass__()
-        breakpoint()
         if cls.__name__ != 'Not':
             cls.__call__ = decrement_sp_on_call(cls.__call__)
 
@@ -122,7 +121,7 @@ class Gt(LogicalVMCommand):
         super().__init__()
 
     def __call__(self):
-        return self._assemble_boolean('D;JLT\n')
+        return self._assemble_boolean('D+1;JGT\n')
 
 
 class Lt(LogicalVMCommand):
@@ -130,7 +129,7 @@ class Lt(LogicalVMCommand):
         super().__init__()
 
     def __call__(self):
-        return self._assemble_boolean('D;JGT\n')
+        return self._assemble_boolean('D-1;JLT\n')
 
 
 class And(LogicalVMCommand):
@@ -138,29 +137,11 @@ class And(LogicalVMCommand):
         super().__init__()
 
     def __call__(self):
-        comment = '// and\n'
-        text = comment + f'@{SP.value - 1}\nD=M+1\n'
-        text += f'@FALSEBRANCH_{self._clslabel}{self.labelcount}\n'
-        text +=  'D;JNE\n' # If first value is not -1 (true), jump to false branch
-
-        text += f'@{SP.value - 2}\nD=M+1\n'
-        text += f'@FALSEBRANCH_{self._clslabel}{self.labelcount}\n'
-        text +=  'D;JNE\n' # If second value is not -1 (true), jump to false branch
-
-        # Else, both are true and result is -1 (true)
+        text = '// and\n'   
+        text += f'@{SP.value - 1}\n'
+        text += 'D=M\n'
         text += f'@{SP.value - 2}\n'
-        text += 'M=-1\n'
-
-        text += self._put_end_label_reference()
-        text += self._put_uncond_jump()
-
-        text += f'(FALSEBRANCH_{self._clslabel}{self.labelcount})\n'
-        text += f'@{SP.value - 2}\n'
-        text +=  'M=0\n'
-
-        text += self._put_end_label()
-
-        self.labelcount += 1
+        text += 'M=D&M\n'
         return text
 
 
@@ -169,30 +150,11 @@ class Or(LogicalVMCommand):
         super().__init__()
 
     def __call__(self):
-        comment = '// or\n'
-        text = comment + f'@{SP.value - 1}\nD=M+1\n'
-        text += f'@TRUEBRANCH_{self._clslabel}{self.labelcount}\n'
-        text +=  'D;JEQ\n' # If value is true, jump to true branch
-
-        text = comment + f'@{SP.value - 2}\nD=M+1\n'
-        text += f'@TRUEBRANCH_{self._clslabel}{self.labelcount}\n'
-        text +=  'D;JEQ\n' # If value is true, jump to true branch
-
-        # Else, it's false
+        text = '// or\n'   
+        text += f'@{SP.value - 1}\n'
+        text += 'D=M\n'
         text += f'@{SP.value - 2}\n'
-        text +=  'M=0\n'
-
-        text += self._put_end_label_reference()
-        text += self._put_uncond_jump()
-
-        # True branch
-        text += f'(TRUEBRANCH_{self._clslabel}{self.labelcount})\n'
-        text += f'@{SP.value - 2}\n'
-        text +=  'M=-1\n'
-
-        text += self._put_end_label()
-        
-        self.labelcount += 1
+        text += 'M=D|M\n'
         return text
 
 
@@ -201,11 +163,9 @@ class Not(LogicalVMCommand):
         super().__init__()
 
     def __call__(self):
-        comment = '// not\n'
-        text = comment + f'@{SP.value - 1}\nD=M\n'
-        text += 'M=!D\n'
-
-        self.labelcount += 1
+        text = '// not\n'
+        text += f'@{SP.value - 1}\n'
+        text += 'M=!M\n'
         return text
 
 
@@ -226,7 +186,7 @@ def add():
 def sub():
     comment = '// sub\n'
     s1 = f'@{SP.value - 1}\nD=M\n'
-    s2 = f'@{SP.value - 2}\nM=D-M\n'
+    s2 = f'@{SP.value - 2}\nM=M-D\n'
     s3 = SP.decrement()
     return comment + s1 + s2 + s3
 
