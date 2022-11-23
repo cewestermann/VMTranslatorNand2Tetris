@@ -33,7 +33,7 @@ def decrement_sp_on_call(f):
 class VMCommand: pass
 
 
-class LogicalVMCommand(VMCommand):
+class ArithmeticVMCommand(VMCommand):
     def __init__(self):
         self.labelcount = 0
 
@@ -108,7 +108,7 @@ class LogicalVMCommand(VMCommand):
         return text
 
 
-class Eq(LogicalVMCommand):
+class Eq(ArithmeticVMCommand):
     def __init__(self):
         super().__init__()
 
@@ -116,7 +116,7 @@ class Eq(LogicalVMCommand):
         return self._assemble_boolean('D;JNE\n')
 
 
-class Gt(LogicalVMCommand):
+class Gt(ArithmeticVMCommand):
     def __init__(self):
         super().__init__()
 
@@ -124,7 +124,7 @@ class Gt(LogicalVMCommand):
         return self._assemble_boolean('D+1;JGT\n')
 
 
-class Lt(LogicalVMCommand):
+class Lt(ArithmeticVMCommand):
     def __init__(self):
         super().__init__()
 
@@ -132,7 +132,7 @@ class Lt(LogicalVMCommand):
         return self._assemble_boolean('D-1;JLT\n')
 
 
-class And(LogicalVMCommand):
+class And(ArithmeticVMCommand):
     def __init__(self):
         super().__init__()
 
@@ -145,7 +145,7 @@ class And(LogicalVMCommand):
         return text
 
 
-class Or(LogicalVMCommand):
+class Or(ArithmeticVMCommand):
     def __init__(self):
         super().__init__()
 
@@ -158,7 +158,7 @@ class Or(LogicalVMCommand):
         return text
 
 
-class Not(LogicalVMCommand):
+class Not(ArithmeticVMCommand):
     def __init__(self):
         super().__init__()
 
@@ -167,14 +167,6 @@ class Not(LogicalVMCommand):
         text += f'@{SP.value - 1}\n'
         text += 'M=!M\n'
         return text
-
-
-def constant(value):
-    comment = f'// push constant {value}\n'
-    s1 = f'@{value}\nD=A\n' 
-    s2 = f'@{SP.address}\nA=M\nM=D\n'
-    s3 = SP.increment()
-    return comment + s1 + s2 + s3
 
 def add(): 
     comment = '// add\n'
@@ -195,15 +187,36 @@ def neg():
     s1 = f'@{SP.value - 1}\nM=-M'
     return comment + s1
 
-_segments = {'constant': constant}
 
-def push(segment, value):
-    return _segments[segment](value)
+class PushVMCommand(VMCommand):
+    @staticmethod
+    def constant(value):
+        comment = f'// push constant {value}\n'
+        text = comment + f'@{value}\nD=A\n'
+        text += f'@{SP.address}\nA=M\nM=D\n'
+        return text + SP.increment()
+
+    @staticmethod
+    def local(value): pass
+
+    @staticmethod
+    def that(value): pass
+
+    @staticmethod
+    def this(value): pass
+
+    @staticmethod
+    def temp(value): pass
+
+
+def pushpop(obj, segment, value):
+    return getattr(obj, segment)(value)
 
 
 class CodeWriter:
     method_dict = {
-        'push': push,
+        'push': PushVMCommand,
+        'pop': pushpop,
     }
 
     arithmetic_dict = {
@@ -227,11 +240,11 @@ class CodeWriter:
 
     def _write_push_pop(self, command):
         ctype, *args = command
-        f = self.method_dict[ctype]
-        self.file.write(f(*args))
+        obj = self.method_dict[ctype]
+        self.file.write(pushpop(obj, *args))
 
     def write_command(self, command):
-        if command.type.value == 'push':
+        if command.type.value in ('push', 'pop'):
             self._write_push_pop(command)
         else:
             self._write_arithmetic(command)

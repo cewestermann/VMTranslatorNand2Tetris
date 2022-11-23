@@ -20,9 +20,10 @@ _arithmetics = (
 
 _arithmetics_dict = {arith: CommandType.C_ARITHMETIC for arith in _arithmetics}
 
-_push_dict = {'push': CommandType.C_PUSH}
+_push_pop_dict = {'push': CommandType.C_PUSH,
+                  'pop': CommandType.C_POP}
 
-_arg0s = ChainMap(_arithmetics_dict, _push_dict)
+_arg0s = ChainMap(_arithmetics_dict, _push_pop_dict)
 
 
 def _get_command_type(tokens):
