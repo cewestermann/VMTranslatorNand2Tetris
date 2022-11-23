@@ -1,26 +1,29 @@
 from functools import wraps
 from contextlib import contextmanager
+from enum import Enum
 
 from .command import Command
 
 
-class StackPointer:
-    def __init__(self):
-        self.address = 0
-        self.value = 256
+class Pointer:
+    def __init__(self, address, value):
+        self.address = address
+        self.value = value
 
     def increment(self):
         self.value += 1
-        comment = '// increment stack pointer\n'
-        return comment + f'@{SP.address}\nM=M+1\n'
+        return self._put_comment() + f'@{self.address}\nM=M+1\n'
 
     def decrement(self):
         self.value -= 1
-        comment = '// decrement stack pointer\n'
-        return comment + f'@{SP.address}\nM=M-1\n'
+        return self._put_comment() + f'@{self.address}\nM=M-1\n'
+
+    def _put_comment(self):
+        return f'// increment {type(self).__name__}\n'
 
 
-SP = StackPointer()
+SP = Pointer(0, 256)
+LCL = Pointer(1, 300)
 
 def decrement_sp_on_call(f):
   @wraps(f)
