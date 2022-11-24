@@ -208,7 +208,8 @@ class PushVMCommand(VMCommand):
         return text + SP.increment()
 
     @staticmethod
-    def local(value): pass
+    def local(value):
+        comment = f'// push local {value}\n'
 
     @staticmethod
     def that(value): pass
