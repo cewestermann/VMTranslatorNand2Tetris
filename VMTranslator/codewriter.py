@@ -39,6 +39,7 @@ def _clslabel(obj):
 def _clsvariable(obj):
     return f'{type(obj).__name__}'
 
+
 class VMCommand: pass
 
 
@@ -201,20 +202,31 @@ class Segment:
 
         self.labelcount = 1
 
-    # TODO: Refactor push/pop
-    def push(self, offset):
-        text = f'// push {self.name} {offset}\n'
-        text += f'@{offset}\n'
+    def _put_variable_ref(self):
+        return f'@{_clsvariable(self) + str(self.labelcount)}\n'
+
+    def _save_segment_address(self, offset):
+        text = f'@{offset}\n'
         text += 'D=M\n' # Set D to offset
         text += f'@{self.address}\n'
         text += 'D=D+M\n'
-        text += f'@{_clsvariable(self) + str(self.labelcount)}\n'
+        text += self._put_variable_ref()
         text += 'M=D\n' # Save base + offset in variable
-        text += f'@{SP.value}\n'
-        text += 'D=M\n' # Save stack value in D
-        text += f'@{_clsvariable(self) + str(self.labelcount)}\n'
+        return text
+
+    def _set_value(self):
+        text = self._put_variable_ref()
         text += 'A=M\n' # Go to base + offset
         text += 'M=D\n' # Set base + offset to value from stack
+        return text
+
+    # TODO: Refactor push/pop
+    def push(self, offset):
+        text = f'// push {self.name} {offset}\n'
+        text += self._save_segment_address(offset)
+        text += f'@{SP.value}\n'
+        text += 'D=M\n' # Save stack value in D
+        text += self._set_value()
         text += SP.increment()
 
         self.labelcount += 1
@@ -222,17 +234,10 @@ class Segment:
 
     def pop(self, offset):
         text = f'// pop {self.name} {offset}\n'
-        text += f'@{offset}\n'
-        text += 'D=M\n' # Set D to offset
-        text += f'@{self.address}\n'
-        text += 'D=D+M\n'
-        text += f'@{_clsvariable(self) + str(self.labelcount)}\n'
-        text += 'M=D\n' # Save base + offset in variable
+        text += self._save_segment_address(offset)
         text += f'@{SP.value - 1}\n'
         text += f'D=M\n'
-        text += f'@{_clsvariable(self) + str(self.labelcount)}\n'
-        text += 'A=M\n' # Move to D + offset
-        text += 'M=D\n' # Set place on segment stack to value of SP
+        text += self._set_value()
         text += SP.decrement()
 
         self.labelcount += 1
@@ -243,7 +248,7 @@ LCL = Segment(1, 300, 'local')
 ARG = Segment(2, 400, 'arg')
 THIS = Segment(3, 3000, 'this')
 THAT = Segment(4, 3010, 'that')
-
+TEMP = Segment(5, 5, 'temp')
 
 class PushVMCommand(VMCommand):
 
@@ -256,17 +261,21 @@ class PushVMCommand(VMCommand):
 
     @staticmethod
     def local(offset):
-        comment = f'// push local {offset}\n'
-        return comment + LCL.push(offset)
+        return LCL.push(offset)
 
     @staticmethod
-    def that(value): pass
+    def that(offset): 
+        return THAT.push(offset)
 
     @staticmethod
-    def this(value): pass
+    def this(offset):
+        return THIS.push(offset)
 
     @staticmethod
-    def temp(value): pass
+    def temp(offset): 
+        text = f'// push temp {offset}'
+
+        
 
 
 def pushpop(obj, segment, offset):
