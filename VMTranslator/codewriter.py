@@ -245,7 +245,7 @@ class Segment:
 
 
 LCL = Segment(1, 300, 'local')
-ARG = Segment(2, 400, 'arg')
+ARG = Segment(2, 400, 'argument')
 THIS = Segment(3, 3000, 'this')
 THAT = Segment(4, 3010, 'that')
 TEMP = Segment(5, 5, 'temp')
@@ -273,7 +273,7 @@ class PushVMCommand(VMCommand):
 
     @staticmethod
     def temp(offset): 
-        text = f'// push temp {offset}'
+        return TEMP.push(offset)
 
         
 
