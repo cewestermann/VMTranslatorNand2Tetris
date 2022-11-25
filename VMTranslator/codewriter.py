@@ -1,6 +1,5 @@
 from functools import wraps
 from contextlib import contextmanager
-from collections import namedtuple
 
 from .command import Command
 
@@ -8,7 +7,8 @@ from .command import Command
 class StackPointer:
     def __init__(self):
         self.address = 0
-        self.value = 256
+        self.value = 256 # TODO: Should not keep track of the value here
+                         # Should be done exclusively in assembly
 
     def increment(self):
         self.value += 1
@@ -33,6 +33,12 @@ def decrement_sp_on_call(f):
   return wrapper
 
 
+def _clslabel(obj):
+    return f'{type(obj).__name__.upper()}'
+
+def _clsvariable(obj):
+    return f'{type(obj).__name__}'
+
 class VMCommand: pass
 
 
@@ -54,10 +60,6 @@ class ArithmeticVMCommand(VMCommand):
             'D=D-M\n'
         )
 
-    @property
-    def _clslabel(self):
-        return f'{type(self).__name__.upper()}'
-
     def _condition_result(self):
         # True part
         text = self._true_branch()
@@ -71,14 +73,14 @@ class ArithmeticVMCommand(VMCommand):
         return text
 
     def _false_branch(self):
-        text =  f'// if not {self._clslabel}\n'
+        text =  f'// if not {_clslabel}\n'
         text += f'@{SP.value - 2}\n'
         text +=  'M=0\n'
         return text
 
     def _true_branch(self):
         text = (
-            f'// if {self._clslabel}\n'
+            f'// if {_clslabel}\n'
             f'@{SP.value - 2}\n'
              'M=-1\n' # Word of ones (true)
         )
@@ -89,19 +91,19 @@ class ArithmeticVMCommand(VMCommand):
         return f'0;JMP\n'
 
     def _put_label_reference(self):
-        return f'@{self._clslabel}{self.labelcount}\n'
+        return f'@{_clslabel}{self.labelcount}\n'
 
     def _put_label(self):
-        return f'({self._clslabel}{self.labelcount})\n'
+        return f'({_clslabel}{self.labelcount})\n'
 
     def _put_end_label_reference(self):
-        return f'@END_{self._clslabel}{self.labelcount}\n'
+        return f'@END_{_clslabel}{self.labelcount}\n'
 
     def _put_end_label(self):
-        return f'(END_{self._clslabel}{self.labelcount})\n'
+        return f'(END_{_clslabel}{self.labelcount})\n'
 
     def _assemble_boolean(self, jump_cond):
-        text = f'// {self._clslabel}\n'
+        text = f'// {_clslabel}\n'
         text += self._compare_op()
         text += self._put_label_reference()
         text += jump_cond
@@ -191,15 +193,60 @@ def neg():
     return comment + s1
 
 
-Segment = namedtuple('Segment', ['address', 'base'])
+class Segment:
+    def __init__(self, address, base, name):
+        self.address = address
+        self.base = base
+        self.name = name
 
-LCL = Segment(1, 300)
-ARG = Segment(2, 400)
-THIS = Segment(3, 3000)
-THAT = Segment(4, 3010)
+        self.labelcount = 1
+
+    # TODO: Refactor push/pop
+    def push(self, offset):
+        text = f'// push {self.name} {offset}\n'
+        text += f'@{offset}\n'
+        text += 'D=M\n' # Set D to offset
+        text += f'@{self.address}\n'
+        text += 'D=D+M\n'
+        text += f'@{_clsvariable(self) + str(self.labelcount)}\n'
+        text += 'M=D\n' # Save base + offset in variable
+        text += f'@{SP.value}\n'
+        text += 'D=M\n' # Save stack value in D
+        text += f'@{_clsvariable(self) + str(self.labelcount)}\n'
+        text += 'A=M\n' # Go to base + offset
+        text += 'M=D\n' # Set base + offset to value from stack
+        text += SP.increment()
+
+        self.labelcount += 1
+        return text
+
+    def pop(self, offset):
+        text = f'// pop {self.name} {offset}\n'
+        text += f'@{offset}\n'
+        text += 'D=M\n' # Set D to offset
+        text += f'@{self.address}\n'
+        text += 'D=D+M\n'
+        text += f'@{_clsvariable(self) + str(self.labelcount)}\n'
+        text += 'M=D\n' # Save base + offset in variable
+        text += f'@{SP.value - 1}\n'
+        text += f'D=M\n'
+        text += f'@{_clsvariable(self) + str(self.labelcount)}\n'
+        text += 'A=M\n' # Move to D + offset
+        text += 'M=D\n' # Set place on segment stack to value of SP
+        text += SP.decrement()
+
+        self.labelcount += 1
+        return text
+
+
+LCL = Segment(1, 300, 'local')
+ARG = Segment(2, 400, 'arg')
+THIS = Segment(3, 3000, 'this')
+THAT = Segment(4, 3010, 'that')
 
 
 class PushVMCommand(VMCommand):
+
     @staticmethod
     def constant(value):
         comment = f'// push constant {value}\n'
@@ -208,8 +255,9 @@ class PushVMCommand(VMCommand):
         return text + SP.increment()
 
     @staticmethod
-    def local(value):
-        comment = f'// push local {value}\n'
+    def local(offset):
+        comment = f'// push local {offset}\n'
+        return comment + LCL.push(offset)
 
     @staticmethod
     def that(value): pass
@@ -221,8 +269,8 @@ class PushVMCommand(VMCommand):
     def temp(value): pass
 
 
-def pushpop(obj, segment, value):
-    return getattr(obj, segment)(value)
+def pushpop(obj, segment, offset):
+    return getattr(obj, segment.name)(offset)
 
 
 _method_dict = {
