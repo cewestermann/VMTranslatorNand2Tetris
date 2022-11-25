@@ -275,8 +275,6 @@ class PushVMCommand(VMCommand):
     def temp(offset): 
         return TEMP.push(offset)
 
-        
-
 
 def pushpop(obj, segment, offset):
     return getattr(obj, segment.name)(offset)
