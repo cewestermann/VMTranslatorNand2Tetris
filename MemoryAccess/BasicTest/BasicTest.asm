@@ -9,7 +9,7 @@ M=D
 M=M+1
 // pop local 0
 @0
-D=M
+D=A
 @1
 D=D+M
 @Segment1
@@ -42,7 +42,7 @@ M=D
 M=M+1
 // pop argument 2
 @2
-D=M
+D=A
 @2
 D=D+M
 @Segment1
@@ -57,7 +57,7 @@ M=D
 M=M-1
 // pop argument 1
 @1
-D=M
+D=A
 @2
 D=D+M
 @Segment2
@@ -81,7 +81,7 @@ M=D
 M=M+1
 // pop this 6
 @6
-D=M
+D=A
 @3
 D=D+M
 @Segment1
@@ -114,7 +114,7 @@ M=D
 M=M+1
 // pop that 5
 @5
-D=M
+D=A
 @4
 D=D+M
 @Segment1
@@ -129,7 +129,7 @@ M=D
 M=M-1
 // pop that 2
 @2
-D=M
+D=A
 @4
 D=D+M
 @Segment2
@@ -152,46 +152,31 @@ M=D
 @0
 M=M+1
 // pop temp 6
-@6
-D=M
-@5
-D=D+M
-@Segment1
-M=D
 @256
 D=M
-@Segment1
-A=M
+@11
 M=D
 // increment StackPointer
 @0
 M=M-1
 // push local 0
 @0
-D=M
+D=A
 @1
-D=D+M
-@Segment2
-M=D
-@256
+A=D+M
 D=M
-@Segment2
-A=M
+@256
 M=D
 // increment StackPointer
 @0
 M=M+1
 // push that 5
 @5
-D=M
+D=A
 @4
-D=D+M
-@Segment3
-M=D
-@257
+A=D+M
 D=M
-@Segment3
-A=M
+@257
 M=D
 // increment StackPointer
 @0
@@ -206,15 +191,11 @@ M=D+M
 M=M-1
 // push argument 1
 @1
-D=M
+D=A
 @2
-D=D+M
-@Segment3
-M=D
-@257
+A=D+M
 D=M
-@Segment3
-A=M
+@257
 M=D
 // increment StackPointer
 @0
@@ -229,30 +210,22 @@ M=M-D
 M=M-1
 // push this 6
 @6
-D=M
+D=A
 @3
-D=D+M
-@Segment2
-M=D
-@257
+A=D+M
 D=M
-@Segment2
-A=M
+@257
 M=D
 // increment StackPointer
 @0
 M=M+1
 // push this 6
 @6
-D=M
+D=A
 @3
-D=D+M
-@Segment3
-M=D
-@258
+A=D+M
 D=M
-@Segment3
-A=M
+@258
 M=D
 // increment StackPointer
 @0
@@ -274,16 +247,9 @@ M=M-D
 @0
 M=M-1
 // push temp 6
-@6
+@11
 D=M
-@5
-D=D+M
-@Segment2
-M=D
 @257
-D=M
-@Segment2
-A=M
 M=D
 // increment StackPointer
 @0

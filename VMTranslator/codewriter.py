@@ -206,11 +206,19 @@ class Segment:
 
     def _save_segment_address(self, offset):
         text = f'@{offset}\n'
-        text += 'D=M\n' # Set D to offset
+        text += 'D=A\n' # Set D to offset
         text += f'@{self.address}\n'
         text += 'D=D+M\n'
         text += self._put_variable_ref()
         text += 'M=D\n' # Save base + offset in variable
+        return text
+
+    def _push_from_segment(self, offset):
+        text = f'@{offset}\n'
+        text += 'D=A\n' # Set D to offset
+        text += f'@{self.address}\n'
+        text += 'A=D+M\n'
+        text += 'D=M\n'
         return text
 
     def _set_value(self):
@@ -222,10 +230,9 @@ class Segment:
     # TODO: Refactor push/pop
     def push(self, offset):
         text = f'// push {self.name} {offset}\n'
-        text += self._save_segment_address(offset)
+        text += self._push_from_segment(offset)
         text += f'@{SP.value}\n'
-        text += 'D=M\n' # Save stack value in D
-        text += self._set_value()
+        text += 'M=D\n' # Push segment value to stack
         text += SP.increment()
 
         self.labelcount += 1
@@ -243,74 +250,50 @@ class Segment:
         return text
 
 
-LCL = Segment(1, 300, 'local')
-ARG = Segment(2, 400, 'argument')
-THIS = Segment(3, 3000, 'this')
-THAT = Segment(4, 3010, 'that')
-TEMP = Segment(5, 5, 'temp')
+class TempSegment: # TODO: Refactor
+    def __init__(self):
+        self.base = 5
+        self.name = 'temp'
 
+    def push(self, offset):
+        text = f'// push {self.name} {offset}\n'
+        text += f'@{self.base + int(offset)}\n'
+        text +=  'D=M\n'
+        text += f'@{SP.value}\n'
+        text +=  'M=D\n'
+        text += SP.increment()
+        return text
 
-class PushVMCommand(VMCommand):
+    def pop(self, offset):
+        text = f'// pop {self.name} {offset}\n'
+        text += f'@{SP.value - 1}\n'
+        text += 'D=M\n'
+        text += f'@{self.base + int(offset)}\n'
+        text += 'M=D\n'
+        text += SP.decrement()
+        return text
 
-    @staticmethod
-    def constant(value):
-        comment = f'// push constant {value}\n'
-        text = comment + f'@{value}\nD=A\n'
-        text += f'@{SP.address}\nA=M\nM=D\n'
-        return text + SP.increment()
-
-    @staticmethod
-    def local(offset):
-        return LCL.push(offset)
-
-    @staticmethod
-    def that(offset): 
-        return THAT.push(offset)
-
-    @staticmethod
-    def this(offset):
-        return THIS.push(offset)
-
-    @staticmethod
-    def temp(offset): 
-        return TEMP.push(offset)
-
-    @staticmethod
-    def argument(offset):
-        return ARG.push(offset)
-
-
-class PopVMCommand(VMCommand):
-
-    @staticmethod
-    def local(offset):
-        return LCL.pop(offset)
-
-    @staticmethod
-    def that(offset): 
-        return THAT.pop(offset)
-
-    @staticmethod
-    def this(offset):
-        return THIS.pop(offset)
-
-    @staticmethod
-    def temp(offset): 
-        return TEMP.pop(offset)
-
-    @staticmethod
-    def argument(offset):
-        return ARG.pop(offset)
-
-
-def pushpop(obj, segment, offset):
-    return getattr(obj, segment)(offset)
-
-
-_method_dict = {
-    'push': PushVMCommand,
-    'pop': PopVMCommand,
+_segment_dict = {
+  'local': Segment(1, 300, 'local'),
+  'argument': Segment(2, 400, 'argument'),
+  'this': Segment(3, 3000, 'this'),
+  'that': Segment(4, 3010, 'that'), 
+  'temp': TempSegment(),
 }
+
+def push_constant(offset):
+    comment = f'// push constant {offset}\n'
+    text = comment + f'@{offset}\nD=A\n'
+    text += f'@{SP.address}\nA=M\nM=D\n'
+    return text + SP.increment()
+
+
+def pushpop(f, segment, offset):
+    if segment == 'constant':
+        return push_constant(offset)
+    segment = _segment_dict[segment]
+    return getattr(segment, f)(offset)
+
 
 _arithmetic_dict = {
     'add': add,
@@ -324,7 +307,6 @@ _arithmetic_dict = {
     'not': Not()
 }
 
-
 class CodeWriter:
     def __init__(self, filename):
         self.file = open(filename, 'w')
@@ -335,8 +317,7 @@ class CodeWriter:
 
     def _write_push_pop(self, command):
         ctype, *args = command
-        obj = _method_dict[ctype]
-        self.file.write(pushpop(obj, *args))
+        self.file.write(pushpop(ctype, *args))
 
     def write_command(self, command):
         if command.type.value in ('push', 'pop'):
