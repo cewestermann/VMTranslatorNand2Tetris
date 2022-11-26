@@ -9,7 +9,6 @@ class StackPointer:
         self.address = 0
         self.value = 256 # TODO: Should not keep track of the value here
                          # Should be done exclusively in assembly
-
     def increment(self):
         self.value += 1
         return self._put_comment() + f'@{self.address}\nM=M+1\n'
