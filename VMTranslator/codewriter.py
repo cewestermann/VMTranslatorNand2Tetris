@@ -304,6 +304,7 @@ class StaticSegment:
         text += SP.decrement()
         return text
 
+
 _segment_dict = {
   'local': Segment(1, 300, 'local'),
   'argument': Segment(2, 400, 'argument'),
@@ -312,6 +313,30 @@ _segment_dict = {
   'temp': TempSegment(),
   'static': StaticSegment()
 }
+
+
+class PointerSegment:
+    def __init__(self):
+        self.name = 'pointer'
+        self._ref = {
+            '0': _segment_dict['this'],
+            '1': _segment_dict['that']
+        }
+
+    def push(self, offset):
+        text = '// push {self.name} {offset}\n'
+        return text + self._ref[offset].push(offset)
+        
+        #if offset:
+        #    segment = _segment_dict['that']
+        #else:
+        #    segment = _segment_dict['this']
+
+
+
+
+    def pop(self, offset): pass
+
 
 def push_constant(offset):
     comment = f'// push constant {offset}\n'
