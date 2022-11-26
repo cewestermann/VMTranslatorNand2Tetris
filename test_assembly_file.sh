@@ -1,8 +1,8 @@
 #!usr/bin/bash
 
-python -m VMTranslator VMTranslator/BasicTest.vm
+python -m VMTranslator VMTranslator/StaticTest.vm
 
-mv ./BasicTest.asm ./MemoryAccess/BasicTest/
+mv ./StaticTest.asm ./MemoryAccess/StaticTest/
 
 bash ../nand2tetris/tools/CPUEmulator.sh
 

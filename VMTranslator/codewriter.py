@@ -1,7 +1,15 @@
 from functools import wraps
 from contextlib import contextmanager
+from pathlib import Path
 
 from .command import Command
+
+
+FILENAME = None
+
+def set_filename(filename):
+    global FILENAME
+    FILENAME = filename
 
 
 class StackPointer:
@@ -273,12 +281,36 @@ class TempSegment: # TODO: Refactor
         text += SP.decrement()
         return text
 
+
+class StaticSegment:
+    def __init__(self):
+        self.name = 'static'
+
+    def push(self, offset):
+        text = f'@{FILENAME}.{offset}\n'
+        text += 'D=M\n'
+        text += f'@{SP.value}\n'
+        text += 'M=D\n'
+
+        text += SP.increment()
+        return text
+
+    def pop(self, offset):
+        text = f'@{SP.value - 1}\n'
+        text += 'D=M\n'
+        text += f'@{FILENAME}.{offset}\n'
+        text += 'M=D\n'
+
+        text += SP.decrement()
+        return text
+
 _segment_dict = {
   'local': Segment(1, 300, 'local'),
   'argument': Segment(2, 400, 'argument'),
   'this': Segment(3, 3000, 'this'),
   'that': Segment(4, 3010, 'that'), 
   'temp': TempSegment(),
+  'static': StaticSegment()
 }
 
 def push_constant(offset):
@@ -310,6 +342,7 @@ _arithmetic_dict = {
 class CodeWriter:
     def __init__(self, filename):
         self.file = open(filename, 'w')
+        set_filename(Path(filename).stem)
 
     def _write_arithmetic(self, command):
         f = _arithmetic_dict[command.arg0]
