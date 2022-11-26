@@ -250,6 +250,7 @@ THIS = Segment(3, 3000, 'this')
 THAT = Segment(4, 3010, 'that')
 TEMP = Segment(5, 5, 'temp')
 
+
 class PushVMCommand(VMCommand):
 
     @staticmethod
@@ -275,14 +276,41 @@ class PushVMCommand(VMCommand):
     def temp(offset): 
         return TEMP.push(offset)
 
+    @staticmethod
+    def argument(offset):
+        return ARG.push(offset)
+
+
+class PopVMCommand(VMCommand):
+
+    @staticmethod
+    def local(offset):
+        return LCL.pop(offset)
+
+    @staticmethod
+    def that(offset): 
+        return THAT.pop(offset)
+
+    @staticmethod
+    def this(offset):
+        return THIS.pop(offset)
+
+    @staticmethod
+    def temp(offset): 
+        return TEMP.pop(offset)
+
+    @staticmethod
+    def argument(offset):
+        return ARG.pop(offset)
+
 
 def pushpop(obj, segment, offset):
-    return getattr(obj, segment.name)(offset)
+    return getattr(obj, segment)(offset)
 
 
 _method_dict = {
     'push': PushVMCommand,
-    'pop': pushpop,
+    'pop': PopVMCommand,
 }
 
 _arithmetic_dict = {
