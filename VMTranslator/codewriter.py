@@ -120,38 +120,15 @@ class BooleanVMCommand(VMCommand):
         return f'(END_{self._label_and_count()})\n'
 
 
-#class Eq(BooleanVMCommand):
-#    def __init__(self):
-#        super().__init__()
-#
-#    def __call__(self):
-#        return self._assemble_boolean('D;JNE\n')
-#
-#
-#class Gt(BooleanVMCommand):
-#    def __init__(self):
-#        super().__init__()
-#
-#    def __call__(self):
-#        return self._assemble_boolean('D+1;JGT\n')
-#
-#
-#class Lt(BooleanVMCommand):
-#    def __init__(self):
-#        super().__init__()
-#
-#    def __call__(self):
-#        return self._assemble_boolean('D-1;JLT\n')
-
-
-class TempCommand:
+# TODO: Maybe refactor these out into plain functions ? 
+class ArithmeticVMCommand(VMCommand):
     def __init_subclass__(cls):
         super().__init_subclass__()
         if cls.__name__ != 'Not' and cls.__name__ != 'Neg':
             cls.__call__ = decrement_sp_on_call(cls.__call__)
     
 
-class And(TempCommand):
+class And(ArithmeticVMCommand):
     def __init__(self):
         super().__init__()
 
@@ -164,7 +141,7 @@ class And(TempCommand):
         return text
 
 
-class Or(TempCommand):
+class Or(ArithmeticVMCommand):
     def __init__(self):
         super().__init__()
 
@@ -177,7 +154,7 @@ class Or(TempCommand):
         return text
 
 
-class Not(TempCommand):
+class Not(ArithmeticVMCommand):
     def __init__(self):
         super().__init__()
 
@@ -188,7 +165,7 @@ class Not(TempCommand):
         return text
 
 
-class Add(TempCommand):
+class Add(ArithmeticVMCommand):
     def __init__(self):
         super().__init__()
 
@@ -199,7 +176,7 @@ class Add(TempCommand):
         return text
 
 
-class Sub(TempCommand):
+class Sub(ArithmeticVMCommand):
     def __init__(self):
         super().__init__()
 
@@ -210,7 +187,7 @@ class Sub(TempCommand):
         return text
 
 
-class Neg(TempCommand):
+class Neg(ArithmeticVMCommand):
     def __init__(self):
         super().__init__()
 
@@ -334,6 +311,7 @@ _segment_dict = {
 }
 
 
+# TODO: Find a smarter way to have a reference to THIS and THAT segments
 class PointerSegment:
     def __init__(self):
         self.name = 'pointer'
@@ -346,14 +324,6 @@ class PointerSegment:
         text = '// push {self.name} {offset}\n'
         return text + self._ref[offset].push(offset)
         
-        #if offset:
-        #    segment = _segment_dict['that']
-        #else:
-        #    segment = _segment_dict['this']
-
-
-
-
     def pop(self, offset): pass
 
 
