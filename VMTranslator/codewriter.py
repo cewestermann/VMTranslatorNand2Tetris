@@ -313,16 +313,12 @@ _segment_dict = {
 
 # TODO: Find a smarter way to have a reference to THIS and THAT segments
 class PointerSegment:
-    def __init__(self):
+    def __init__(self, this_segment, that_segment):
         self.name = 'pointer'
-        self._ref = {
-            '0': _segment_dict['this'],
-            '1': _segment_dict['that']
-        }
+        self.this_segment = this_segment
+        self.that_segment = that_segment
 
-    def push(self, offset):
-        text = '// push {self.name} {offset}\n'
-        return text + self._ref[offset].push(offset)
+    def push(self, offset): pass
         
     def pop(self, offset): pass
 
@@ -352,6 +348,7 @@ _arithmetic_dict = {
     'or': Or(),
     'not': Not()
 }
+
 
 class CodeWriter:
     def __init__(self, filename):
