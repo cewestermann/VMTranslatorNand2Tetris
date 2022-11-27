@@ -197,7 +197,7 @@ class Neg(ArithmeticVMCommand):
         return text
         
 
-class Segment:
+class MemorySegment:
     def __init__(self, address, base, name):
         self.address = address
         self.base = base
@@ -302,10 +302,10 @@ class StaticSegment:
 
 
 _segment_dict = {
-  'local': Segment(1, 300, 'local'),
-  'argument': Segment(2, 400, 'argument'),
-  'this': Segment(3, 3000, 'this'),
-  'that': Segment(4, 3010, 'that'), 
+  'local': MemorySegment(1, 300, 'local'),
+  'argument': MemorySegment(2, 400, 'argument'),
+  'this': MemorySegment(3, 3000, 'this'),
+  'that': MemorySegment(4, 3010, 'that'), 
   'temp': TempSegment(),
   'static': StaticSegment()
 }
