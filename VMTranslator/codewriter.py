@@ -7,6 +7,7 @@ from .command import Command
 
 FILENAME = None
 
+
 def set_filename(filename):
     global FILENAME
     FILENAME = filename
@@ -40,11 +41,12 @@ def decrement_sp_on_call(f):
   return wrapper
 
 
-def _clslabel(obj):
-    return f'{type(obj).__name__.upper()}'
-
 def _clsvariable(obj):
     return f'{type(obj).__name__}'
+
+def _clslabel(obj):
+    return _clsvariable(obj).upper()
+
 
 
 class VMCommand: pass
@@ -98,17 +100,20 @@ class ArithmeticVMCommand(VMCommand):
     def _put_uncond_jump():
         return f'0;JMP\n'
 
+    def _label_count(self):
+        return f'{_clslabel}{self.labelcount}'
+
     def _put_label_reference(self):
-        return f'@{_clslabel}{self.labelcount}\n'
+        return f'@{self._label_count()}\n'
 
     def _put_label(self):
-        return f'({_clslabel}{self.labelcount})\n'
+        return f'({self._label_count()})\n'
 
     def _put_end_label_reference(self):
-        return f'@END_{_clslabel}{self.labelcount}\n'
+        return f'@END_{self._label_count()}\n'
 
     def _put_end_label(self):
-        return f'(END_{_clslabel}{self.labelcount})\n'
+        return f'(END_{self._label_count()})\n'
 
     def _assemble_boolean(self, jump_cond):
         text = f'// {_clslabel}\n'
