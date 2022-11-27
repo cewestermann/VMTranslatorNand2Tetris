@@ -301,17 +301,6 @@ class StaticSegment:
         return text
 
 
-_segment_dict = {
-  'local': MemorySegment(1, 300, 'local'),
-  'argument': MemorySegment(2, 400, 'argument'),
-  'this': MemorySegment(3, 3000, 'this'),
-  'that': MemorySegment(4, 3010, 'that'), 
-  'temp': TempSegment(),
-  'static': StaticSegment()
-}
-
-
-# TODO: Find a smarter way to have a reference to THIS and THAT segments
 class PointerSegment:
     def __init__(self, this_segment, that_segment):
         self.name = 'pointer'
@@ -321,6 +310,21 @@ class PointerSegment:
     def push(self, offset): pass
         
     def pop(self, offset): pass
+
+
+# TODO: Not a fan of this way of doing it
+this_segment = MemorySegment(3, 3000, 'this')
+that_segment = MemorySegment(4, 3010, 'that')
+
+_segment_dict = {
+  'local': MemorySegment(1, 300, 'local'),
+  'argument': MemorySegment(2, 400, 'argument'),
+  'this': this_segment,
+  'that': that_segment,
+  'temp': TempSegment(),
+  'static': StaticSegment(),
+  'pointer': PointerSegment(this_segment, that_segment)
+}
 
 
 def push_constant(offset):
