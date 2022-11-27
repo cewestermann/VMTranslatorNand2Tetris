@@ -4,7 +4,7 @@ D=A
 @0
 A=M
 M=D
-// increment stack pointer
+// increment StackPointer
 @0
 M=M+1
 // push constant 17
@@ -13,27 +13,26 @@ D=A
 @0
 A=M
 M=D
-// increment stack pointer
+// increment StackPointer
 @0
 M=M+1
-// EQ
+// eq
 @257
 D=M
 @256
 D=D-M
-@EQ0
-D;JNE
-// if EQ
+@eq0
+D;JNE// if eq
 @256
 M=-1
-@END_EQ0
+@END_eq0
 0;JMP
-(EQ0)
-// if not EQ
+(eq0)
+// if not eq
 @256
 M=0
-(END_EQ0)
-// decrement stack pointer
+(END_eq0)
+// increment StackPointer
 @0
 M=M-1
 // push constant 17
@@ -42,7 +41,7 @@ D=A
 @0
 A=M
 M=D
-// increment stack pointer
+// increment StackPointer
 @0
 M=M+1
 // push constant 16
@@ -51,27 +50,26 @@ D=A
 @0
 A=M
 M=D
-// increment stack pointer
+// increment StackPointer
 @0
 M=M+1
-// EQ
+// eq
 @258
 D=M
 @257
 D=D-M
-@EQ1
-D;JNE
-// if EQ
+@eq1
+D;JNE// if eq
 @257
 M=-1
-@END_EQ1
+@END_eq1
 0;JMP
-(EQ1)
-// if not EQ
+(eq1)
+// if not eq
 @257
 M=0
-(END_EQ1)
-// decrement stack pointer
+(END_eq1)
+// increment StackPointer
 @0
 M=M-1
 // push constant 16
@@ -80,7 +78,7 @@ D=A
 @0
 A=M
 M=D
-// increment stack pointer
+// increment StackPointer
 @0
 M=M+1
 // push constant 17
@@ -89,27 +87,26 @@ D=A
 @0
 A=M
 M=D
-// increment stack pointer
+// increment StackPointer
 @0
 M=M+1
-// EQ
+// eq
 @259
 D=M
 @258
 D=D-M
-@EQ2
-D;JNE
-// if EQ
+@eq2
+D;JNE// if eq
 @258
 M=-1
-@END_EQ2
+@END_eq2
 0;JMP
-(EQ2)
-// if not EQ
+(eq2)
+// if not eq
 @258
 M=0
-(END_EQ2)
-// decrement stack pointer
+(END_eq2)
+// increment StackPointer
 @0
 M=M-1
 // push constant 892
@@ -118,7 +115,7 @@ D=A
 @0
 A=M
 M=D
-// increment stack pointer
+// increment StackPointer
 @0
 M=M+1
 // push constant 891
@@ -127,27 +124,26 @@ D=A
 @0
 A=M
 M=D
-// increment stack pointer
+// increment StackPointer
 @0
 M=M+1
-// LT
+// lt
 @260
 D=M
 @259
 D=D-M
-@LT0
-D-1;JLT
-// if LT
+@lt0
+D-1;JLT// if lt
 @259
 M=-1
-@END_LT0
+@END_lt0
 0;JMP
-(LT0)
-// if not LT
+(lt0)
+// if not lt
 @259
 M=0
-(END_LT0)
-// decrement stack pointer
+(END_lt0)
+// increment StackPointer
 @0
 M=M-1
 // push constant 891
@@ -156,7 +152,7 @@ D=A
 @0
 A=M
 M=D
-// increment stack pointer
+// increment StackPointer
 @0
 M=M+1
 // push constant 892
@@ -165,27 +161,26 @@ D=A
 @0
 A=M
 M=D
-// increment stack pointer
+// increment StackPointer
 @0
 M=M+1
-// LT
+// lt
 @261
 D=M
 @260
 D=D-M
-@LT1
-D-1;JLT
-// if LT
+@lt1
+D-1;JLT// if lt
 @260
 M=-1
-@END_LT1
+@END_lt1
 0;JMP
-(LT1)
-// if not LT
+(lt1)
+// if not lt
 @260
 M=0
-(END_LT1)
-// decrement stack pointer
+(END_lt1)
+// increment StackPointer
 @0
 M=M-1
 // push constant 891
@@ -194,7 +189,7 @@ D=A
 @0
 A=M
 M=D
-// increment stack pointer
+// increment StackPointer
 @0
 M=M+1
 // push constant 891
@@ -203,27 +198,26 @@ D=A
 @0
 A=M
 M=D
-// increment stack pointer
+// increment StackPointer
 @0
 M=M+1
-// LT
+// lt
 @262
 D=M
 @261
 D=D-M
-@LT2
-D-1;JLT
-// if LT
+@lt2
+D-1;JLT// if lt
 @261
 M=-1
-@END_LT2
+@END_lt2
 0;JMP
-(LT2)
-// if not LT
+(lt2)
+// if not lt
 @261
 M=0
-(END_LT2)
-// decrement stack pointer
+(END_lt2)
+// increment StackPointer
 @0
 M=M-1
 // push constant 32767
@@ -232,7 +226,7 @@ D=A
 @0
 A=M
 M=D
-// increment stack pointer
+// increment StackPointer
 @0
 M=M+1
 // push constant 32766
@@ -241,27 +235,26 @@ D=A
 @0
 A=M
 M=D
-// increment stack pointer
+// increment StackPointer
 @0
 M=M+1
-// GT
+// gt
 @263
 D=M
 @262
 D=D-M
-@GT0
-D+1;JGT
-// if GT
+@gt0
+D+1;JGT// if gt
 @262
 M=-1
-@END_GT0
+@END_gt0
 0;JMP
-(GT0)
-// if not GT
+(gt0)
+// if not gt
 @262
 M=0
-(END_GT0)
-// decrement stack pointer
+(END_gt0)
+// increment StackPointer
 @0
 M=M-1
 // push constant 32766
@@ -270,7 +263,7 @@ D=A
 @0
 A=M
 M=D
-// increment stack pointer
+// increment StackPointer
 @0
 M=M+1
 // push constant 32767
@@ -279,27 +272,26 @@ D=A
 @0
 A=M
 M=D
-// increment stack pointer
+// increment StackPointer
 @0
 M=M+1
-// GT
+// gt
 @264
 D=M
 @263
 D=D-M
-@GT1
-D+1;JGT
-// if GT
+@gt1
+D+1;JGT// if gt
 @263
 M=-1
-@END_GT1
+@END_gt1
 0;JMP
-(GT1)
-// if not GT
+(gt1)
+// if not gt
 @263
 M=0
-(END_GT1)
-// decrement stack pointer
+(END_gt1)
+// increment StackPointer
 @0
 M=M-1
 // push constant 32766
@@ -308,7 +300,7 @@ D=A
 @0
 A=M
 M=D
-// increment stack pointer
+// increment StackPointer
 @0
 M=M+1
 // push constant 32766
@@ -317,27 +309,26 @@ D=A
 @0
 A=M
 M=D
-// increment stack pointer
+// increment StackPointer
 @0
 M=M+1
-// GT
+// gt
 @265
 D=M
 @264
 D=D-M
-@GT2
-D+1;JGT
-// if GT
+@gt2
+D+1;JGT// if gt
 @264
 M=-1
-@END_GT2
+@END_gt2
 0;JMP
-(GT2)
-// if not GT
+(gt2)
+// if not gt
 @264
 M=0
-(END_GT2)
-// decrement stack pointer
+(END_gt2)
+// increment StackPointer
 @0
 M=M-1
 // push constant 57
@@ -346,7 +337,7 @@ D=A
 @0
 A=M
 M=D
-// increment stack pointer
+// increment StackPointer
 @0
 M=M+1
 // push constant 31
@@ -355,7 +346,7 @@ D=A
 @0
 A=M
 M=D
-// increment stack pointer
+// increment StackPointer
 @0
 M=M+1
 // push constant 53
@@ -364,7 +355,7 @@ D=A
 @0
 A=M
 M=D
-// increment stack pointer
+// increment StackPointer
 @0
 M=M+1
 // add
@@ -372,7 +363,7 @@ M=M+1
 D=M
 @266
 M=D+M
-// decrement stack pointer
+// increment StackPointer
 @0
 M=M-1
 // push constant 112
@@ -381,7 +372,7 @@ D=A
 @0
 A=M
 M=D
-// increment stack pointer
+// increment StackPointer
 @0
 M=M+1
 // sub
@@ -389,7 +380,7 @@ M=M+1
 D=M
 @266
 M=M-D
-// decrement stack pointer
+// increment StackPointer
 @0
 M=M-1
 // neg
@@ -399,7 +390,7 @@ M=-M// and
 D=M
 @265
 M=D&M
-// decrement stack pointer
+// increment StackPointer
 @0
 M=M-1
 // push constant 82
@@ -408,7 +399,7 @@ D=A
 @0
 A=M
 M=D
-// increment stack pointer
+// increment StackPointer
 @0
 M=M+1
 // or
@@ -416,7 +407,7 @@ M=M+1
 D=M
 @265
 M=D|M
-// decrement stack pointer
+// increment StackPointer
 @0
 M=M-1
 // not

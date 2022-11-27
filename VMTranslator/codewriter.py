@@ -44,22 +44,26 @@ def decrement_sp_on_call(f):
 def _clsvariable(obj):
     return f'{type(obj).__name__}'
 
-def _clslabel(obj):
-    return _clsvariable(obj).upper()
-
-
 
 class VMCommand: pass
 
 
-class ArithmeticVMCommand(VMCommand):
-    def __init__(self):
+class BooleanVMCommand(VMCommand):
+    def __init__(self, name, jump_condition):
         self.labelcount = 0
+        self.name = name
+        self._jmp_cond = jump_condition
 
-    def __init_subclass__(cls):
-        super().__init_subclass__()
-        if cls.__name__ != 'Not':
-            cls.__call__ = decrement_sp_on_call(cls.__call__)
+    @decrement_sp_on_call
+    def __call__(self):
+        text = f'// {self.name}\n'
+        text += self._compare_op()
+        text += self._put_label_reference()
+        text += self._jmp_cond
+        text += self._condition_result()
+
+        self.labelcount += 1
+        return text
 
     @staticmethod
     def _compare_op():
@@ -83,14 +87,14 @@ class ArithmeticVMCommand(VMCommand):
         return text
 
     def _false_branch(self):
-        text =  f'// if not {_clslabel}\n'
+        text =  f'// if not {self.name}\n'
         text += f'@{SP.value - 2}\n'
         text +=  'M=0\n'
         return text
 
     def _true_branch(self):
         text = (
-            f'// if {_clslabel}\n'
+            f'// if {self.name}\n'
             f'@{SP.value - 2}\n'
              'M=-1\n' # Word of ones (true)
         )
@@ -100,57 +104,54 @@ class ArithmeticVMCommand(VMCommand):
     def _put_uncond_jump():
         return f'0;JMP\n'
 
-    def _label_count(self):
-        return f'{_clslabel}{self.labelcount}'
+    def _label_and_count(self):
+        return f'{self.name}{self.labelcount}'
 
     def _put_label_reference(self):
-        return f'@{self._label_count()}\n'
+        return f'@{self._label_and_count()}\n'
 
     def _put_label(self):
-        return f'({self._label_count()})\n'
+        return f'({self._label_and_count()})\n'
 
     def _put_end_label_reference(self):
-        return f'@END_{self._label_count()}\n'
+        return f'@END_{self._label_and_count()}\n'
 
     def _put_end_label(self):
-        return f'(END_{self._label_count()})\n'
-
-    def _assemble_boolean(self, jump_cond):
-        text = f'// {_clslabel}\n'
-        text += self._compare_op()
-        text += self._put_label_reference()
-        text += jump_cond
-        text += self._condition_result()
-
-        self.labelcount += 1
-        return text
+        return f'(END_{self._label_and_count()})\n'
 
 
-class Eq(ArithmeticVMCommand):
-    def __init__(self):
-        super().__init__()
+#class Eq(BooleanVMCommand):
+#    def __init__(self):
+#        super().__init__()
+#
+#    def __call__(self):
+#        return self._assemble_boolean('D;JNE\n')
+#
+#
+#class Gt(BooleanVMCommand):
+#    def __init__(self):
+#        super().__init__()
+#
+#    def __call__(self):
+#        return self._assemble_boolean('D+1;JGT\n')
+#
+#
+#class Lt(BooleanVMCommand):
+#    def __init__(self):
+#        super().__init__()
+#
+#    def __call__(self):
+#        return self._assemble_boolean('D-1;JLT\n')
 
-    def __call__(self):
-        return self._assemble_boolean('D;JNE\n')
 
+class TempCommand:
+    def __init_subclass__(cls):
+        super().__init_subclass__()
+        if cls.__name__ != 'Not' and cls.__name__ != 'Neg':
+            cls.__call__ = decrement_sp_on_call(cls.__call__)
+    
 
-class Gt(ArithmeticVMCommand):
-    def __init__(self):
-        super().__init__()
-
-    def __call__(self):
-        return self._assemble_boolean('D+1;JGT\n')
-
-
-class Lt(ArithmeticVMCommand):
-    def __init__(self):
-        super().__init__()
-
-    def __call__(self):
-        return self._assemble_boolean('D-1;JLT\n')
-
-
-class And(ArithmeticVMCommand):
+class And(TempCommand):
     def __init__(self):
         super().__init__()
 
@@ -163,7 +164,7 @@ class And(ArithmeticVMCommand):
         return text
 
 
-class Or(ArithmeticVMCommand):
+class Or(TempCommand):
     def __init__(self):
         super().__init__()
 
@@ -176,7 +177,7 @@ class Or(ArithmeticVMCommand):
         return text
 
 
-class Not(ArithmeticVMCommand):
+class Not(TempCommand):
     def __init__(self):
         super().__init__()
 
@@ -187,7 +188,7 @@ class Not(ArithmeticVMCommand):
         return text
 
 
-class Add(ArithmeticVMCommand):
+class Add(TempCommand):
     def __init__(self):
         super().__init__()
 
@@ -198,7 +199,7 @@ class Add(ArithmeticVMCommand):
         return text
 
 
-class Sub(ArithmeticVMCommand):
+class Sub(TempCommand):
     def __init__(self):
         super().__init__()
 
@@ -209,7 +210,7 @@ class Sub(ArithmeticVMCommand):
         return text
 
 
-class Neg(ArithmeticVMCommand):
+class Neg(TempCommand):
     def __init__(self):
         super().__init__()
 
@@ -218,26 +219,6 @@ class Neg(ArithmeticVMCommand):
         text += f'@{SP.value - 1}\nM=-M'
         return text
         
-
-#def add(): 
-#    comment = '// add\n'
-#    s1 = f'@{SP.value - 1}\nD=M\n'
-#    s2 = f'@{SP.value - 2}\nM=D+M\n'
-#    s3 = SP.decrement()
-#    return comment + s1 + s2 + s3
-
-#def sub():
-#    comment = '// sub\n'
-#    s1 = f'@{SP.value - 1}\nD=M\n'
-#    s2 = f'@{SP.value - 2}\nM=M-D\n'
-#    s3 = SP.decrement()
-#    return comment + s1 + s2 + s3
-
-#def neg():
-#    comment = '// neg\n'
-#    s1 = f'@{SP.value - 1}\nM=-M'
-#    return comment + s1
-
 
 class Segment:
     def __init__(self, address, base, name):
@@ -394,9 +375,9 @@ _arithmetic_dict = {
     'add': Add(),
     'sub': Sub(),
     'neg': Neg(),
-    'eq': Eq(),
-    'lt': Lt(),
-    'gt': Gt(),
+    'eq': BooleanVMCommand('eq', 'D;JNE'),
+    'lt': BooleanVMCommand('lt', 'D-1;JLT'),
+    'gt': BooleanVMCommand('gt', 'D+1;JGT'),
     'and': And(),
     'or': Or(),
     'not': Not()
