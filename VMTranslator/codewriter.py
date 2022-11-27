@@ -186,24 +186,57 @@ class Not(ArithmeticVMCommand):
         text += 'M=!M\n'
         return text
 
-def add(): 
-    comment = '// add\n'
-    s1 = f'@{SP.value - 1}\nD=M\n'
-    s2 = f'@{SP.value - 2}\nM=D+M\n'
-    s3 = SP.decrement()
-    return comment + s1 + s2 + s3
 
-def sub():
-    comment = '// sub\n'
-    s1 = f'@{SP.value - 1}\nD=M\n'
-    s2 = f'@{SP.value - 2}\nM=M-D\n'
-    s3 = SP.decrement()
-    return comment + s1 + s2 + s3
+class Add(ArithmeticVMCommand):
+    def __init__(self):
+        super().__init__()
 
-def neg():
-    comment = '// neg\n'
-    s1 = f'@{SP.value - 1}\nM=-M'
-    return comment + s1
+    def __call__(self):
+        text = '// add\n'
+        text += f'@{SP.value - 1}\nD=M\n'
+        text += f'@{SP.value - 2}\nM=D+M\n'
+        return text
+
+
+class Sub(ArithmeticVMCommand):
+    def __init__(self):
+        super().__init__()
+
+    def __call__(self):
+        text = '// sub\n'
+        text += f'@{SP.value - 1}\nD=M\n'
+        text += f'@{SP.value - 2}\nM=M-D\n'
+        return text
+
+
+class Neg(ArithmeticVMCommand):
+    def __init__(self):
+        super().__init__()
+
+    def __call__(self):
+        text = '// neg\n'
+        text += f'@{SP.value - 1}\nM=-M'
+        return text
+        
+
+#def add(): 
+#    comment = '// add\n'
+#    s1 = f'@{SP.value - 1}\nD=M\n'
+#    s2 = f'@{SP.value - 2}\nM=D+M\n'
+#    s3 = SP.decrement()
+#    return comment + s1 + s2 + s3
+
+#def sub():
+#    comment = '// sub\n'
+#    s1 = f'@{SP.value - 1}\nD=M\n'
+#    s2 = f'@{SP.value - 2}\nM=M-D\n'
+#    s3 = SP.decrement()
+#    return comment + s1 + s2 + s3
+
+#def neg():
+#    comment = '// neg\n'
+#    s1 = f'@{SP.value - 1}\nM=-M'
+#    return comment + s1
 
 
 class Segment:
@@ -358,9 +391,9 @@ def pushpop(f, segment, offset):
 
 
 _arithmetic_dict = {
-    'add': add,
-    'sub': sub,
-    'neg': neg,
+    'add': Add(),
+    'sub': Sub(),
+    'neg': Neg(),
     'eq': Eq(),
     'lt': Lt(),
     'gt': Gt(),
