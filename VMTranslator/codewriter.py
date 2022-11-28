@@ -313,23 +313,27 @@ class StaticSegment:
 class PointerSegment:
     def __init__(self, this_segment, that_segment):
         self.name = 'pointer'
+        self.base = 3 # Same as THIS
         self.this_segment = this_segment
         self.that_segment = that_segment
-
-        self.pointer0 = None # The two virtual memory segments of Pointer
-        self.pointer1 = None
+        self.labelcount = 0
 
     def push(self, offset):
-        if offset:
-            self.pointer1 = offset
+        text = f'// push {self.name} {offset}\n'
+        text += f'@{self.base + int(offset)}\n'
+        text +=  'D=M\n'
+        text += f'@{SP.value}\n'
+        text +=  'M=D\n'
+        text += SP.increment()
+        return text
 
-        
     def pop(self, offset):
         text = f'// pop {self.name} {offset}\n'
-        if offset:
-          text += self.that_segment.change_base(self.pointer0)
-        else:
-          text += self.this_segment.change_base(self.pointer1)
+        text += f'@{SP.value - 1}\n'
+        text += 'D=M\n'
+        text += f'@{self.base + int(offset)}\n'
+        text += 'M=D\n'
+        text += SP.decrement()
         return text
 
 
