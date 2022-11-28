@@ -253,6 +253,15 @@ class MemorySegment:
         self.labelcount += 1
         return text
 
+    def change_base(self, newvalue):
+        text = f'// Change base of {self.name} to {newvalue}\n'
+        text += f'@{newvalue}\n'
+        text += 'D=M\n'
+        text += f'@{self.address}\n'
+        text += 'M=D\n'
+        return text
+        
+
 
 class TempSegment: # TODO: Refactor
     def __init__(self):
@@ -307,9 +316,21 @@ class PointerSegment:
         self.this_segment = this_segment
         self.that_segment = that_segment
 
-    def push(self, offset): pass
+        self.pointer0 = None # The two virtual memory segments of Pointer
+        self.pointer1 = None
+
+    def push(self, offset):
+        if offset:
+            self.pointer1 = offset
+
         
-    def pop(self, offset): pass
+    def pop(self, offset):
+        text = f'// pop {self.name} {offset}\n'
+        if offset:
+          text += self.that_segment.change_base(self.pointer0)
+        else:
+          text += self.this_segment.change_base(self.pointer1)
+        return text
 
 
 # TODO: Not a fan of this way of doing it
