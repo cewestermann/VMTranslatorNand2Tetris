@@ -2,7 +2,7 @@ from functools import wraps
 from contextlib import contextmanager
 from pathlib import Path
 
-from .command import Command
+from .command import Command, CommandType
 
 
 FILENAME = None
@@ -392,11 +392,25 @@ class CodeWriter:
         ctype, *args = command
         self.file.write(pushpop(ctype, *args))
 
+    def _write_label(self, command):
+        pass
+
+    def _write_goto(self, command):
+        pass
+
+    def _write_if(self, command):
+        pass
+
     def write_command(self, command):
-        if command.type.value in ('push', 'pop'):
-            self._write_push_pop(command)
+        if command.type is CommandType.C_POP or command.type is CommandType.C_PUSH:
+            f = self._write_push_pop
+        elif command.type is CommandType.C_ARITHMETIC:
+            f = self._write_arithmetic
+        elif command.type.value == 'if-goto':
+            f = self._write_if
         else:
-            self._write_arithmetic(command)
+            f = getattr(self, '_write_' + command.type.value)
+        return f(command)
 
     def close(self):
         self.file.close()
