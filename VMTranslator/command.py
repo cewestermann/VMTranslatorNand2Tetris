@@ -5,6 +5,13 @@ class CommandType(str, Enum):
     C_ARITHMETIC = 'arithmetic'
     C_PUSH = 'push'
     C_POP = 'pop'
+    C_LABEL = 'label'
+    C_GOTO = 'goto'
+    C_IF = 'if-goto'
+    C_FUNCTION = 'function'
+    C_RETURN = 'return'
+    C_CALL = 'call'
+
 
 _arithmetics = (
     'add',
@@ -20,8 +27,16 @@ _arithmetics = (
 
 _arithmetics_dict = {arith: CommandType.C_ARITHMETIC for arith in _arithmetics}
 
+# TODO: This does not sit well with me, but it'll do for now
+# since I don't have quick ways to test larger changers.
 _push_pop_dict = {'push': CommandType.C_PUSH,
-                  'pop': CommandType.C_POP}
+                  'pop': CommandType.C_POP,
+                  'label': CommandType.C_LABEL,
+                  'goto': CommandType.C_GOTO,
+                  'if-goto': CommandType.C_IF,
+                  'function': CommandType.C_FUNCTION,
+                  'return': CommandType.C_RETURN,
+                  'call': CommandType.C_CALL}
 
 _arg0s = ChainMap(_arithmetics_dict, _push_pop_dict)
 
