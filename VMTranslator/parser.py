@@ -1,3 +1,6 @@
+import sys
+from pathlib import Path
+
 from .command import Command
 
 class EOF: pass
@@ -8,8 +11,16 @@ def _is_redundant(tokens):
     return not tokens or tokens[0].startswith('/')
 
 
+def _clean_for_comments(tokens):
+    for i, t in enumerate(tokens):
+        if t == '//':
+            return tokens[:i]
+    return tokens
+
+
 class Parser:
     def __init__(self, file):
+        self.filename = Path(file).name
         self.file = open(file, 'rt')
         self.current_command = None
 
@@ -20,7 +31,7 @@ class Parser:
         tokens = line.split()
         if _is_redundant(tokens):
             return next(self)
-        return tokens
+        return _clean_for_comments(tokens)
 
     def has_more_commands(self):
         if self.current_command is None:
@@ -36,7 +47,8 @@ class Parser:
             self.current_command = None # Consume
             return command
         else:
-            raise StopIteration
+            print(f'Finished parsing {self.filename}')
+            sys.exit()
 
     def close(self): self.file.close()
 

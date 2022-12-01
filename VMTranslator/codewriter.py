@@ -393,13 +393,17 @@ class CodeWriter:
         self.file.write(pushpop(ctype, *args))
 
     def _write_label(self, command):
-        pass
+      self.file.write(f'(global${command.arg1})\n') # TODO: Make a put_label function
 
     def _write_goto(self, command):
         pass
 
     def _write_if(self, command):
-        pass
+        text = f'// if-goto {command.arg1}\n'
+        text += 'D=M\n'
+        text += f'@global${command.arg1}\n'
+        text += 'D;JNE\n'
+        self.file.write(text)
 
     def write_command(self, command):
         if command.type is CommandType.C_POP or command.type is CommandType.C_PUSH:
