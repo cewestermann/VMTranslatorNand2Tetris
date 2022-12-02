@@ -123,6 +123,7 @@ M=D
 @0
 M=M+1
 // if-goto LOOP_START
+@257
 D=M
 @global$LOOP_START
 D;JNE

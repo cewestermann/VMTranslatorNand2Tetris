@@ -400,6 +400,7 @@ class CodeWriter:
 
     def _write_if(self, command):
         text = f'// if-goto {command.arg1}\n'
+        text += f'@{SP.value}\n'
         text += 'D=M\n'
         text += f'@global${command.arg1}\n'
         text += 'D;JNE\n'
