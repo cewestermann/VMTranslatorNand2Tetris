@@ -393,7 +393,7 @@ class CodeWriter:
         self.file.write(pushpop(ctype, *args))
 
     def _write_label(self, command):
-      self.file.write(f'(global${command.arg1})\n') # TODO: Make a put_label function
+        self.file.write(f'(global${command.arg1})\n') # TODO: Make a put_label function
 
     def _write_goto(self, command):
         pass
