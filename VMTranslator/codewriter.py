@@ -405,7 +405,7 @@ class CodeWriter:
         text = f'// if-goto {command.arg1}\n'
         text += f'@{SP.value - 1}\n'
         text += 'D=M\n'
-        text += SP.decrement()
+        text += SP.decrement() # The value is popped from the stack
         text += f'@global${command.arg1}\n'
         text += 'D;JNE\n'
         self.file.write(text)

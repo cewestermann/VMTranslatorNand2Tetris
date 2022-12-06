@@ -1,6 +1,6 @@
 #!usr/bin/bash
 
-FILENAME=BasicLoop
+FILENAME=FibonacciSeries
 
 python -m VMTranslator VMTranslator/$FILENAME.vm
 
