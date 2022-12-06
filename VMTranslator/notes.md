@@ -1,19 +1,8 @@
+## Current Issue
 
+When we follow a goto or if-goto statement, the variable names and their
+addresses stay the same and are used even though they are supposed to be dead.
 
+Solution: Probably need to rewrite the way that we calculate the offset, such that
+we can avoid using variables.
 
-### LT
-
-// lt
-
-f'@{SP.value - 1}\n'
-'D=M\n'
-f'@{SP.value - 2}\n'
-'D=D-M\n'
-@LT
-D;JLT
-
-
-D=5
-D=5-5
-
-D=0
