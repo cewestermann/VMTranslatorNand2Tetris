@@ -1,10 +1,12 @@
 #!usr/bin/bash
 
-python -m VMTranslator VMTranslator/BasicLoop.vm
+FILENAME=BasicLoop
 
-mv ./BasicLoop.asm ./ProgramFlow/BasicLoop/
+python -m VMTranslator VMTranslator/$FILENAME.vm
 
-bash ../nand2tetris/tools/CPUEmulator.sh
+mv ./$FILENAME.asm ./ProgramFlow/$FILENAME/
+
+bash ./tools/CPUEmulator.sh
 
 
 

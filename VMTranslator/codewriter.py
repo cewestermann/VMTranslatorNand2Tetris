@@ -20,14 +20,13 @@ class StackPointer:
                          # Should be done exclusively in assembly
     def increment(self):
         self.value += 1
-        return self._put_comment() + f'@{self.address}\nM=M+1\n'
+        comment = '// increment stack pointer\n'
+        return comment + f'@{self.address}\nM=M+1\n'
 
     def decrement(self):
         self.value -= 1
-        return self._put_comment() + f'@{self.address}\nM=M-1\n'
-
-    def _put_comment(self):
-        return f'// increment {type(self).__name__}\n'
+        comment = '// decrement stack pointer\n'
+        return comment + f'@{self.address}\nM=M-1\n'
 
 
 SP = StackPointer()
@@ -118,6 +117,7 @@ class BooleanVMCommand(VMCommand):
 
     def _put_end_label(self):
         return f'(END_{self._label_and_count()})\n'
+
 
 
 # TODO: Maybe refactor these out into plain functions ? 
@@ -355,7 +355,7 @@ _segment_dict = {
 def push_constant(offset):
     comment = f'// push constant {offset}\n'
     text = comment + f'@{offset}\nD=A\n'
-    text += f'@{SP.address}\nA=M\nM=D\n'
+    text += f'@{SP.value}\nM=D\n'
     return text + SP.increment()
 
 
@@ -396,12 +396,16 @@ class CodeWriter:
         self.file.write(f'(global${command.arg1})\n') # TODO: Make a put_label function
 
     def _write_goto(self, command):
-        pass
+        text = f'// goto {command.arg1}\n'
+        text += f'@{command.arg1}\n'
+        text += f'0;JMP\n'
+        self.file.write(text)
 
     def _write_if(self, command):
         text = f'// if-goto {command.arg1}\n'
-        text += f'@{SP.value}\n'
+        text += f'@{SP.value - 1}\n'
         text += 'D=M\n'
+        text += SP.decrement()
         text += f'@global${command.arg1}\n'
         text += 'D;JNE\n'
         self.file.write(text)

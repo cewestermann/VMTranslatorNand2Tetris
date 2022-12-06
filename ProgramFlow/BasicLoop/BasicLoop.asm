@@ -1,10 +1,9 @@
 // push constant 0
 @0
 D=A
-@0
-A=M
+@256
 M=D
-// increment StackPointer
+// increment stack pointer
 @0
 M=M+1
 // pop local 0
@@ -19,7 +18,7 @@ D=M
 @MemorySegment1
 A=M
 M=D
-// increment StackPointer
+// decrement stack pointer
 @0
 M=M-1
 (global$LOOP_START)
@@ -31,7 +30,7 @@ A=D+M
 D=M
 @256
 M=D
-// increment StackPointer
+// increment stack pointer
 @0
 M=M+1
 // push local 0
@@ -42,7 +41,7 @@ A=D+M
 D=M
 @257
 M=D
-// increment StackPointer
+// increment stack pointer
 @0
 M=M+1
 // add
@@ -50,7 +49,7 @@ M=M+1
 D=M
 @256
 M=D+M
-// increment StackPointer
+// decrement stack pointer
 @0
 M=M-1
 // pop local 0
@@ -65,7 +64,7 @@ D=M
 @MemorySegment3
 A=M
 M=D
-// increment StackPointer
+// decrement stack pointer
 @0
 M=M-1
 // push argument 0
@@ -76,16 +75,15 @@ A=D+M
 D=M
 @256
 M=D
-// increment StackPointer
+// increment stack pointer
 @0
 M=M+1
 // push constant 1
 @1
 D=A
-@0
-A=M
+@257
 M=D
-// increment StackPointer
+// increment stack pointer
 @0
 M=M+1
 // sub
@@ -93,7 +91,7 @@ M=M+1
 D=M
 @256
 M=M-D
-// increment StackPointer
+// decrement stack pointer
 @0
 M=M-1
 // pop argument 0
@@ -108,7 +106,7 @@ D=M
 @MemorySegment3
 A=M
 M=D
-// increment StackPointer
+// decrement stack pointer
 @0
 M=M-1
 // push argument 0
@@ -119,12 +117,15 @@ A=D+M
 D=M
 @256
 M=D
-// increment StackPointer
+// increment stack pointer
 @0
 M=M+1
 // if-goto LOOP_START
-@257
+@256
 D=M
+// decrement stack pointer
+@0
+M=M-1
 @global$LOOP_START
 D;JNE
 // push local 0
@@ -133,8 +134,8 @@ D=A
 @1
 A=D+M
 D=M
-@257
+@256
 M=D
-// increment StackPointer
+// increment stack pointer
 @0
 M=M+1
