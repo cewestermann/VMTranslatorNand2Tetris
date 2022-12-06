@@ -1,8 +1,5 @@
 // push argument 1
-@1
-D=A
-@2
-A=D+M
+@401
 D=M
 @256
 M=D
@@ -26,16 +23,9 @@ M=D
 @0
 M=M+1
 // pop that 0
-@0
-D=A
-@4
-D=D+M
-@MemorySegment1
-M=D
 @256
 D=M
-@MemorySegment1
-A=M
+@3010
 M=D
 // decrement stack pointer
 @0
@@ -49,25 +39,15 @@ M=D
 @0
 M=M+1
 // pop that 1
-@1
-D=A
-@4
-D=D+M
-@MemorySegment2
-M=D
 @256
 D=M
-@MemorySegment2
-A=M
+@3011
 M=D
 // decrement stack pointer
 @0
 M=M-1
 // push argument 0
-@0
-D=A
-@2
-A=D+M
+@400
 D=M
 @256
 M=D
@@ -91,26 +71,16 @@ M=M-D
 @0
 M=M-1
 // pop argument 0
-@0
-D=A
-@2
-D=D+M
-@MemorySegment3
-M=D
 @256
 D=M
-@MemorySegment3
-A=M
+@400
 M=D
 // decrement stack pointer
 @0
 M=M-1
 (global$MAIN_LOOP_START)
 // push argument 0
-@0
-D=A
-@2
-A=D+M
+@400
 D=M
 @256
 M=D
@@ -130,10 +100,7 @@ D;JNE
 0;JMP
 (global$COMPUTE_ELEMENT)
 // push that 0
-@0
-D=A
-@4
-A=D+M
+@3010
 D=M
 @256
 M=D
@@ -141,10 +108,7 @@ M=D
 @0
 M=M+1
 // push that 1
-@1
-D=A
-@4
-A=D+M
+@3011
 D=M
 @257
 M=D
@@ -160,16 +124,9 @@ M=D+M
 @0
 M=M-1
 // pop that 2
-@2
-D=A
-@4
-D=D+M
-@MemorySegment5
-M=D
 @256
 D=M
-@MemorySegment5
-A=M
+@3012
 M=D
 // decrement stack pointer
 @0
@@ -207,10 +164,7 @@ M=D
 @0
 M=M-1
 // push argument 0
-@0
-D=A
-@2
-A=D+M
+@400
 D=M
 @256
 M=D
@@ -234,16 +188,9 @@ M=M-D
 @0
 M=M-1
 // pop argument 0
-@0
-D=A
-@2
-D=D+M
-@MemorySegment6
-M=D
 @256
 D=M
-@MemorySegment6
-A=M
+@400
 M=D
 // decrement stack pointer
 @0

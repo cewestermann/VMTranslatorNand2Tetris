@@ -119,7 +119,6 @@ class BooleanVMCommand(VMCommand):
         return f'(END_{self._label_and_count()})\n'
 
 
-
 # TODO: Maybe refactor these out into plain functions ? 
 class ArithmeticVMCommand(VMCommand):
     def __init_subclass__(cls):
@@ -195,72 +194,33 @@ class Neg(ArithmeticVMCommand):
         text = '// neg\n'
         text += f'@{SP.value - 1}\nM=-M'
         return text
-        
+
 
 class MemorySegment:
+    # TODO: Still not working and go back to using the 
+    # pointers in the lower end of the RAM
     def __init__(self, address, base, name):
         self.address = address
         self.base = base
         self.name = name
 
-        self.labelcount = 1
-
-    def _put_variable_ref(self):
-        return f'@{_clsvariable(self) + str(self.labelcount)}\n'
-
-    def _save_segment_address(self, offset):
-        text = f'@{offset}\n'
-        text += 'D=A\n' # Set D to offset
-        text += f'@{self.address}\n'
-        text += 'D=D+M\n'
-        text += self._put_variable_ref()
-        text += 'M=D\n' # Save base + offset in variable
-        return text
-
-    def _push_from_segment(self, offset):
-        text = f'@{offset}\n'
-        text += 'D=A\n' # Set D to offset
-        text += f'@{self.address}\n'
-        text += 'A=D+M\n'
-        text += 'D=M\n'
-        return text
-
-    def _set_value(self):
-        text = self._put_variable_ref()
-        text += 'A=M\n' # Go to base + offset
-        text += 'M=D\n' # Set base + offset to value from stack
-        return text
-
-    # TODO: Refactor push/pop
     def push(self, offset):
         text = f'// push {self.name} {offset}\n'
-        text += self._push_from_segment(offset)
+        text += f'@{self.base + int(offset)}\n'
+        text += 'D=M\n'
         text += f'@{SP.value}\n'
-        text += 'M=D\n' # Push segment value to stack
+        text += 'M=D\n'
         text += SP.increment()
-
-        self.labelcount += 1
         return text
 
     def pop(self, offset):
         text = f'// pop {self.name} {offset}\n'
-        text += self._save_segment_address(offset)
         text += f'@{SP.value - 1}\n'
         text += f'D=M\n'
-        text += self._set_value()
-        text += SP.decrement()
-
-        self.labelcount += 1
-        return text
-
-    def change_base(self, newvalue):
-        text = f'// Change base of {self.name} to {newvalue}\n'
-        text += f'@{newvalue}\n'
-        text += 'D=M\n'
-        text += f'@{self.address}\n'
+        text += f'@{self.base + int(offset)}\n'
         text += 'M=D\n'
+        text += SP.decrement()
         return text
-        
 
 
 class TempSegment: # TODO: Refactor
