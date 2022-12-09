@@ -21,12 +21,25 @@ class StackPointer:
     def increment(self):
         self.value += 1
         comment = '// increment stack pointer\n'
-        return comment + f'@{self.address}\nM=M+1\n'
+        return comment + f'@SP\nM=M+1\n'
 
     def decrement(self):
         self.value -= 1
         comment = '// decrement stack pointer\n'
-        return comment + f'@{self.address}\nM=M-1\n'
+        return comment + f'@SP\nM=M-1\n'
+
+    @staticmethod
+    def first_value():
+        text = '@SP\n'
+        text += 'A=M-1\n'
+        return text
+
+    @staticmethod
+    def second_value():
+        text = '@SP\n'
+        text += 'A=M-1\n'
+        text += 'A=A-1\n'
+        return text
 
 
 SP = StackPointer()
@@ -66,12 +79,11 @@ class BooleanVMCommand(VMCommand):
 
     @staticmethod
     def _compare_op():
-        return (
-           f'@{SP.value - 1}\n'
-            'D=M\n'
-           f'@{SP.value - 2}\n'
-            'D=D-M\n'
-        )
+        text = SP.first_value()
+        text += 'D=M\n'
+        text += SP.second_value()
+        text += 'D=D-M\n'
+        return text
 
     def _condition_result(self):
         # True part
@@ -87,16 +99,14 @@ class BooleanVMCommand(VMCommand):
 
     def _false_branch(self):
         text =  f'// if not {self.name}\n'
-        text += f'@{SP.value - 2}\n'
+        text += SP.second_value()
         text +=  'M=0\n'
         return text
 
     def _true_branch(self):
-        text = (
-            f'// if {self.name}\n'
-            f'@{SP.value - 2}\n'
-             'M=-1\n' # Word of ones (true)
-        )
+        text = f'// if {self.name}\n'
+        text += SP.second_value()
+        text += 'M=-1\n'
         return text
 
     @staticmethod
@@ -192,7 +202,7 @@ class Neg(ArithmeticVMCommand):
 
     def __call__(self):
         text = '// neg\n'
-        text += f'@{SP.value - 1}\nM=-M'
+        text += f'@{SP.value - 1}\nM=-M\n'
         return text
 
 
@@ -210,17 +220,16 @@ class MemorySegment:
         text += 'D=M\n'
         text += f'@{SP.value}\n'
         text += 'M=D\n'
-        text += SP.increment()
-        return text
+        return text + SP.increment()
 
     def pop(self, offset):
         text = f'// pop {self.name} {offset}\n'
         text += f'@{SP.value - 1}\n'
         text += f'D=M\n'
+
         text += f'@{self.base + int(offset)}\n'
         text += 'M=D\n'
-        text += SP.decrement()
-        return text
+        return text + SP.decrement()
 
 
 class TempSegment: # TODO: Refactor
