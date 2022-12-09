@@ -24,13 +24,17 @@ A=A-1
 D=D-M
 @eq0
 D;JNE// if eq
-@256
+@SP
+A=M-1
+A=A-1
 M=-1
 @END_eq0
 0;JMP
 (eq0)
 // if not eq
-@256
+@SP
+A=M-1
+A=A-1
 M=0
 (END_eq0)
 // decrement stack pointer
@@ -62,13 +66,17 @@ A=A-1
 D=D-M
 @eq1
 D;JNE// if eq
-@257
+@SP
+A=M-1
+A=A-1
 M=-1
 @END_eq1
 0;JMP
 (eq1)
 // if not eq
-@257
+@SP
+A=M-1
+A=A-1
 M=0
 (END_eq1)
 // decrement stack pointer
@@ -100,13 +108,17 @@ A=A-1
 D=D-M
 @eq2
 D;JNE// if eq
-@258
+@SP
+A=M-1
+A=A-1
 M=-1
 @END_eq2
 0;JMP
 (eq2)
 // if not eq
-@258
+@SP
+A=M-1
+A=A-1
 M=0
 (END_eq2)
 // decrement stack pointer
@@ -138,13 +150,17 @@ A=A-1
 D=D-M
 @lt0
 D-1;JLT// if lt
-@259
+@SP
+A=M-1
+A=A-1
 M=-1
 @END_lt0
 0;JMP
 (lt0)
 // if not lt
-@259
+@SP
+A=M-1
+A=A-1
 M=0
 (END_lt0)
 // decrement stack pointer
@@ -176,13 +192,17 @@ A=A-1
 D=D-M
 @lt1
 D-1;JLT// if lt
-@260
+@SP
+A=M-1
+A=A-1
 M=-1
 @END_lt1
 0;JMP
 (lt1)
 // if not lt
-@260
+@SP
+A=M-1
+A=A-1
 M=0
 (END_lt1)
 // decrement stack pointer
@@ -214,13 +234,17 @@ A=A-1
 D=D-M
 @lt2
 D-1;JLT// if lt
-@261
+@SP
+A=M-1
+A=A-1
 M=-1
 @END_lt2
 0;JMP
 (lt2)
 // if not lt
-@261
+@SP
+A=M-1
+A=A-1
 M=0
 (END_lt2)
 // decrement stack pointer
@@ -252,13 +276,17 @@ A=A-1
 D=D-M
 @gt0
 D+1;JGT// if gt
-@262
+@SP
+A=M-1
+A=A-1
 M=-1
 @END_gt0
 0;JMP
 (gt0)
 // if not gt
-@262
+@SP
+A=M-1
+A=A-1
 M=0
 (END_gt0)
 // decrement stack pointer
@@ -290,13 +318,17 @@ A=A-1
 D=D-M
 @gt1
 D+1;JGT// if gt
-@263
+@SP
+A=M-1
+A=A-1
 M=-1
 @END_gt1
 0;JMP
 (gt1)
 // if not gt
-@263
+@SP
+A=M-1
+A=A-1
 M=0
 (END_gt1)
 // decrement stack pointer
@@ -328,13 +360,17 @@ A=A-1
 D=D-M
 @gt2
 D+1;JGT// if gt
-@264
+@SP
+A=M-1
+A=A-1
 M=-1
 @END_gt2
 0;JMP
 (gt2)
 // if not gt
-@264
+@SP
+A=M-1
+A=A-1
 M=0
 (END_gt2)
 // decrement stack pointer

@@ -29,6 +29,12 @@ class StackPointer:
         return comment + f'@SP\nM=M-1\n'
 
     @staticmethod
+    def next_free_pos():
+        text = '@SP\n'
+        text += 'A=M\n'
+        return text
+
+    @staticmethod
     def first_value():
         text = '@SP\n'
         text += 'A=M-1\n'
@@ -143,9 +149,9 @@ class And(ArithmeticVMCommand):
 
     def __call__(self):
         text = '// and\n'   
-        text += f'@{SP.value - 1}\n'
+        text += SP.first_value()
         text += 'D=M\n'
-        text += f'@{SP.value - 2}\n'
+        text += SP.second_value()
         text += 'M=D&M\n'
         return text
 
@@ -156,9 +162,9 @@ class Or(ArithmeticVMCommand):
 
     def __call__(self):
         text = '// or\n'   
-        text += f'@{SP.value - 1}\n'
+        text += SP.first_value()
         text += 'D=M\n'
-        text += f'@{SP.value - 2}\n'
+        text += SP.second_value()
         text += 'M=D|M\n'
         return text
 
@@ -169,7 +175,7 @@ class Not(ArithmeticVMCommand):
 
     def __call__(self):
         text = '// not\n'
-        text += f'@{SP.value - 1}\n'
+        text += SP.first_value()
         text += 'M=!M\n'
         return text
 
@@ -180,8 +186,10 @@ class Add(ArithmeticVMCommand):
 
     def __call__(self):
         text = '// add\n'
-        text += f'@{SP.value - 1}\nD=M\n'
-        text += f'@{SP.value - 2}\nM=D+M\n'
+        text += SP.first_value()
+        text += 'D=M\n'
+        text += SP.second_value()
+        text += 'M=D+M\n'
         return text
 
 
@@ -191,8 +199,10 @@ class Sub(ArithmeticVMCommand):
 
     def __call__(self):
         text = '// sub\n'
-        text += f'@{SP.value - 1}\nD=M\n'
-        text += f'@{SP.value - 2}\nM=M-D\n'
+        text += SP.first_value()
+        text += 'D=M\n'
+        text += SP.second_value()
+        text += 'M=M-D\n'
         return text
 
 
@@ -202,7 +212,8 @@ class Neg(ArithmeticVMCommand):
 
     def __call__(self):
         text = '// neg\n'
-        text += f'@{SP.value - 1}\nM=-M\n'
+        text += SP.first_value()
+        text += 'M=-M\n'
         return text
 
 

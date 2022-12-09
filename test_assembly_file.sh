@@ -1,10 +1,10 @@
 #!usr/bin/bash
 
-FILENAME=FibonacciSeries
+FILENAME=StackTest
 
 python -m VMTranslator VMTranslator/$FILENAME.vm
 
-mv ./$FILENAME.asm ./ProgramFlow/$FILENAME/
+mv ./$FILENAME.asm ./StackArithmetic/$FILENAME/
 
 bash ./tools/CPUEmulator.sh
 
