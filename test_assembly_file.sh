@@ -1,6 +1,6 @@
 #!usr/bin/bash
 
-FILENAME=StaticTest
+FILENAME=PointerTest
 
 python -m VMTranslator VMTranslator/$FILENAME.vm
 

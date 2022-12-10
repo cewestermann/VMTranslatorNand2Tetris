@@ -1,144 +1,185 @@
 // push constant 3030
 @3030
 D=A
+@256
+M=D
+// increment stack pointer
+@SP
+M=M+1
+// pop PNTR 0
+// Store offset in Register 13
 @0
+D=A
+@3
+D=A+D
+@R13
+M=D
+// Save Stack value and use Register 13 to pop to segment
+@SP
+A=M-1
+D=M
+@R13
 A=M
 M=D
-// increment StackPointer
-@0
-M=M+1
-// pop pointer 0
-@256
-D=M
-@3
-M=D
-// increment StackPointer
-@0
+// decrement stack pointer
+@SP
 M=M-1
 // push constant 3040
 @3040
 D=A
-@0
+@256
+M=D
+// increment stack pointer
+@SP
+M=M+1
+// pop PNTR 1
+// Store offset in Register 13
+@1
+D=A
+@3
+D=A+D
+@R13
+M=D
+// Save Stack value and use Register 13 to pop to segment
+@SP
+A=M-1
+D=M
+@R13
 A=M
 M=D
-// increment StackPointer
-@0
-M=M+1
-// pop pointer 1
-@256
-D=M
-@4
-M=D
-// increment StackPointer
-@0
+// decrement stack pointer
+@SP
 M=M-1
 // push constant 32
 @32
 D=A
-@0
-A=M
+@256
 M=D
-// increment StackPointer
-@0
+// increment stack pointer
+@SP
 M=M+1
-// pop this 2
+// pop THIS 2
+// Store offset in Register 13
 @2
 D=A
-@3
-D=D+M
-@MemorySegment1
+@THIS
+D=M+D
+@R13
 M=D
-@256
+// Save Stack value and use Register 13 to pop to segment
+@SP
+A=M-1
 D=M
-@MemorySegment1
+@R13
 A=M
 M=D
-// increment StackPointer
-@0
+// decrement stack pointer
+@SP
 M=M-1
 // push constant 46
 @46
 D=A
-@0
-A=M
+@256
 M=D
-// increment StackPointer
-@0
+// increment stack pointer
+@SP
 M=M+1
-// pop that 6
+// pop THAT 6
+// Store offset in Register 13
 @6
 D=A
-@4
-D=D+M
-@MemorySegment1
+@THAT
+D=M+D
+@R13
 M=D
-@256
+// Save Stack value and use Register 13 to pop to segment
+@SP
+A=M-1
 D=M
-@MemorySegment1
+@R13
 A=M
 M=D
-// increment StackPointer
-@0
+// decrement stack pointer
+@SP
 M=M-1
-// push pointer 0
+// push PNTR 0
+@0
+D=A
 @3
+A=A+D
 D=M
-@256
+@SP
+A=M
 M=D
-// increment StackPointer
-@0
+// increment stack pointer
+@SP
 M=M+1
-// push pointer 1
-@4
+// push PNTR 1
+@1
+D=A
+@3
+A=A+D
 D=M
-@257
+@SP
+A=M
 M=D
-// increment StackPointer
-@0
+// increment stack pointer
+@SP
 M=M+1
 // add
-@257
+@SP
+A=M-1
 D=M
-@256
+@SP
+A=M-1
+A=A-1
 M=D+M
-// increment StackPointer
-@0
+// decrement stack pointer
+@SP
 M=M-1
-// push this 2
+// push THIS 2
 @2
 D=A
-@3
-A=D+M
+@THIS
+A=M+D
 D=M
-@257
+@SP
+A=M
 M=D
-// increment StackPointer
-@0
+// increment stack pointer
+@SP
 M=M+1
 // sub
-@257
+@SP
+A=M-1
 D=M
-@256
+@SP
+A=M-1
+A=A-1
 M=M-D
-// increment StackPointer
-@0
+// decrement stack pointer
+@SP
 M=M-1
-// push that 6
+// push THAT 6
 @6
 D=A
-@4
-A=D+M
+@THAT
+A=M+D
 D=M
-@257
+@SP
+A=M
 M=D
-// increment StackPointer
-@0
+// increment stack pointer
+@SP
 M=M+1
 // add
-@257
+@SP
+A=M-1
 D=M
-@256
+@SP
+A=M-1
+A=A-1
 M=D+M
-// increment StackPointer
-@0
+// decrement stack pointer
+@SP
 M=M-1

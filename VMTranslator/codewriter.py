@@ -313,31 +313,67 @@ class StaticSegment:
         return text
 
 
-class PointerSegment:
-    def __init__(self, this_segment, that_segment):
-        self.name = 'pointer'
-        self.base = 3 # Same as THIS
-        self.this_segment = this_segment
-        self.that_segment = that_segment
-        self.labelcount = 0
+class PointerSegment(Segment):
+    def __init__(self, abbr):
+        super().__init__(abbr)
+        self.base = 3
 
     def push(self, offset):
-        text = f'// push {self.name} {offset}\n'
-        text += f'@{self.base + int(offset)}\n'
-        text +=  'D=M\n'
-        text += f'@{SP.value}\n'
-        text +=  'M=D\n'
+        text = f'// push {self.abbr} {offset}\n'
+        text += f'@{offset}\n'
+        text += 'D=A\n'
+        text += f'@{self.base}\n'
+        text += 'A=A+D\n'
+        text += 'D=M\n'
+        text += SP.next_free_pos()
+        text += 'M=D\n'
         text += SP.increment()
         return text
 
-    def pop(self, offset):
-        text = f'// pop {self.name} {offset}\n'
-        text += f'@{SP.value - 1}\n'
+    def pop(self, offset) -> str:
+        text = f'// pop {self.abbr} {offset}\n'
+        text += '// Store offset in Register 13\n'
+        text += f'@{offset}\n'
+        text += 'D=A\n'
+        text += f'@{self.base}\n'
+        text += 'D=A+D\n'
+        text += '@R13\n'
+        text += 'M=D\n'
+        
+        text += '// Save Stack value and use Register 13 to pop to segment\n'
+        text += SP.first_value()
         text += 'D=M\n'
-        text += f'@{self.base + int(offset)}\n'
+        text += '@R13\n'
+        text += 'A=M\n'
         text += 'M=D\n'
         text += SP.decrement()
         return text
+
+#class PointerSegment:
+#    def __init__(self, this_segment, that_segment):
+#        self.name = 'pointer'
+#        self.base = 3 # Same as THIS
+#        self.this_segment = this_segment
+#        self.that_segment = that_segment
+#        self.labelcount = 0
+#
+#    def push(self, offset):
+#        text = f'// push {self.name} {offset}\n'
+#        text += f'@{self.base + int(offset)}\n'
+#        text +=  'D=M\n'
+#        text += f'@{SP.value}\n'
+#        text +=  'M=D\n'
+#        text += SP.increment()
+#        return text
+#
+#    def pop(self, offset):
+#        text = f'// pop {self.name} {offset}\n'
+#        text += f'@{SP.value - 1}\n'
+#        text += 'D=M\n'
+#        text += f'@{self.base + int(offset)}\n'
+#        text += 'M=D\n'
+#        text += SP.decrement()
+#        return text
 
 
 # TODO: Not a fan of this way of doing it
@@ -351,7 +387,7 @@ _segment_dict = {
   'that': that_segment,
   'temp': TempSegment('TEMP'),
   'static': StaticSegment(),
-  'pointer': PointerSegment(this_segment, that_segment)
+  'pointer': PointerSegment('PNTR')
 }
 
 
