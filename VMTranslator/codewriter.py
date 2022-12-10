@@ -236,9 +236,9 @@ class Segment:
         text = f'// pop {self.abbr} {offset}\n'
         text += f'@{offset}\n'
         text += 'D=A\n'
+        text += f'@{self.abbr}\n'
         text += ''
-
-
+        
         text += SP.first_value()
         text += 'D=M\n'
         text += '@R13\n' # Save stack value in R13 register
