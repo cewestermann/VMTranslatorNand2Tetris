@@ -1,10 +1,10 @@
 #!usr/bin/bash
 
-FILENAME=StackTest
+FILENAME=BasicTest
 
 python -m VMTranslator VMTranslator/$FILENAME.vm
 
-mv ./$FILENAME.asm ./StackArithmetic/$FILENAME/
+mv ./$FILENAME.asm ./MemoryAccess/$FILENAME/
 
 bash ./tools/CPUEmulator.sh
 

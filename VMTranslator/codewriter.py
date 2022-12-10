@@ -230,25 +230,28 @@ class Segment:
         text += 'D=M\n'
         text += SP.next_free_pos()
         text += 'M=D\n'
+        text += SP.increment()
         return text
 
     def pop(self, offset) -> str:
         text = f'// pop {self.abbr} {offset}\n'
+        text += '// Store offset in Register 13\n'
         text += f'@{offset}\n'
-        text += 'D=A\n'
-        text += f'@{self.abbr}\n'
-        text += ''
-        
-        text += SP.first_value()
-        text += 'D=M\n'
-        text += '@R13\n' # Save stack value in R13 register
-        text += 'M=D\n'
-        text += '@{offset}\n'
         text += 'D=A\n'
         text += f'@{self.abbr}\n'
         text += 'D=M+D\n'
         text += '@R13\n'
-        text += ''
+        text += 'M=D\n'
+        
+        text += '// Save Stack value and use Register 13 to pop to segment\n'
+        text += SP.first_value()
+        text += 'D=M\n'
+        text += '@R13\n'
+        text += 'A=M\n'
+        text += 'M=D\n'
+        text += SP.decrement()
+        return text
+
 
 class MemorySegment:
     # TODO: Still not working and go back to using the 
@@ -351,12 +354,12 @@ class PointerSegment:
 
 
 # TODO: Not a fan of this way of doing it
-this_segment = MemorySegment(3, 3000, 'this')
-that_segment = MemorySegment(4, 3010, 'that')
+this_segment = Segment('THIS')
+that_segment = Segment('THAT')
 
 _segment_dict = {
-  'local': MemorySegment(1, 300, 'local'),
-  'argument': MemorySegment(2, 400, 'argument'),
+  'local': Segment('LCL'),
+  'argument': Segment('ARG'),
   'this': this_segment,
   'that': that_segment,
   'temp': TempSegment(),
