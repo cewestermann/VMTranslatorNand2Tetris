@@ -217,6 +217,39 @@ class Neg(ArithmeticVMCommand):
         return text
 
 
+class Segment:
+    def __init__(self, abbr):
+        self.abbr = abbr
+
+    def push(self, offset):
+        text = f'// push {self.abbr} {offset}\n'
+        text += f'@{offset}\n'
+        text += 'D=A\n'
+        text += f'@{self.abbr}\n'
+        text += 'A=M+D\n'
+        text += 'D=M\n'
+        text += SP.next_free_pos()
+        text += 'M=D\n'
+        return text
+
+    def pop(self, offset) -> str:
+        text = f'// pop {self.abbr} {offset}\n'
+        text += f'@{offset}\n'
+        text += 'D=A\n'
+        text += ''
+
+
+        text += SP.first_value()
+        text += 'D=M\n'
+        text += '@R13\n' # Save stack value in R13 register
+        text += 'M=D\n'
+        text += '@{offset}\n'
+        text += 'D=A\n'
+        text += f'@{self.abbr}\n'
+        text += 'D=M+D\n'
+        text += '@R13\n'
+        text += ''
+
 class MemorySegment:
     # TODO: Still not working and go back to using the 
     # pointers in the lower end of the RAM
