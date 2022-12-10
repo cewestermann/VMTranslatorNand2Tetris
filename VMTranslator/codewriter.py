@@ -313,43 +313,6 @@ class StaticSegment:
         return text
 
 
-class PointerSegment(Segment):
-    def __init__(self, abbr):
-        super().__init__(abbr)
-        self.base = 3
-
-    def push(self, offset):
-        text = f'// push {self.abbr} {offset}\n'
-        text += f'@{offset}\n'
-        text += 'D=A\n'
-        text += f'@{self.base}\n'
-        text += 'A=A+D\n'
-        text += 'D=M\n'
-        text += SP.next_free_pos()
-        text += 'M=D\n'
-        text += SP.increment()
-        return text
-
-    def pop(self, offset) -> str:
-        text = f'// pop {self.abbr} {offset}\n'
-        text += '// Store offset in Register 13\n'
-        text += f'@{offset}\n'
-        text += 'D=A\n'
-        text += f'@{self.base}\n'
-        text += 'D=A+D\n'
-        text += '@R13\n'
-        text += 'M=D\n'
-        
-        text += '// Save Stack value and use Register 13 to pop to segment\n'
-        text += SP.first_value()
-        text += 'D=M\n'
-        text += '@R13\n'
-        text += 'A=M\n'
-        text += 'M=D\n'
-        text += SP.decrement()
-        return text
-
-
 # TODO: Not a fan of this way of doing it
 this_segment = Segment('THIS')
 that_segment = Segment('THAT')
