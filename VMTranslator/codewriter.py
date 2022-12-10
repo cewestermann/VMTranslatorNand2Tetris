@@ -297,14 +297,14 @@ class StaticSegment:
     def push(self, offset):
         text = f'@{FILENAME}.{offset}\n'
         text += 'D=M\n'
-        text += f'@{SP.value}\n'
+        text += SP.next_free_pos()
         text += 'M=D\n'
 
         text += SP.increment()
         return text
 
     def pop(self, offset):
-        text = f'@{SP.value - 1}\n'
+        text = SP.first_value()
         text += 'D=M\n'
         text += f'@{FILENAME}.{offset}\n'
         text += 'M=D\n'

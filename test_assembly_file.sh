@@ -1,6 +1,6 @@
 #!usr/bin/bash
 
-FILENAME=BasicTest
+FILENAME=StaticTest
 
 python -m VMTranslator VMTranslator/$FILENAME.vm
 
