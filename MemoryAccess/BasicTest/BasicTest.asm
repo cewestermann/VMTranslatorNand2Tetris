@@ -162,10 +162,20 @@ M=D
 // increment stack pointer
 @SP
 M=M+1
-// pop temp 6
-@256
+// pop TEMP 6
+// Store offset in Register 13
+@6
+D=A
+@5
+D=A+D
+@R13
+M=D
+// Save Stack value and use Register 13 to pop to segment
+@SP
+A=M-1
 D=M
-@11
+@R13
+A=M
 M=D
 // decrement stack pointer
 @SP
@@ -274,10 +284,14 @@ M=M-D
 // decrement stack pointer
 @SP
 M=M-1
-// push temp 6
-@11
+// push TEMP 6
+@6
+D=A
+@5
+A=A+D
 D=M
-@257
+@SP
+A=M
 M=D
 // increment stack pointer
 @SP

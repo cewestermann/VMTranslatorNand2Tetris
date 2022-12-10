@@ -218,7 +218,7 @@ class Neg(ArithmeticVMCommand):
 
 
 class Segment:
-    def __init__(self, abbr):
+    def __init__(self, abbr, base=None):
         self.abbr = abbr
 
     def push(self, offset):
@@ -253,51 +253,38 @@ class Segment:
         return text
 
 
-class MemorySegment:
-    # TODO: Still not working and go back to using the 
-    # pointers in the lower end of the RAM
-    def __init__(self, address, base, name):
-        self.address = address
-        self.base = base
-        self.name = name
-
-    def push(self, offset):
-        text = f'// push {self.name} {offset}\n'
-        text += f'@{self.base + int(offset)}\n'
-        text += 'D=M\n'
-        text += f'@{SP.value}\n'
-        text += 'M=D\n'
-        return text + SP.increment()
-
-    def pop(self, offset):
-        text = f'// pop {self.name} {offset}\n'
-        text += f'@{SP.value - 1}\n'
-        text += f'D=M\n'
-
-        text += f'@{self.base + int(offset)}\n'
-        text += 'M=D\n'
-        return text + SP.decrement()
-
-
-class TempSegment: # TODO: Refactor
-    def __init__(self):
+class TempSegment(Segment):
+    def __init__(self, abbr):
+        super().__init__(abbr)
         self.base = 5
-        self.name = 'temp'
 
     def push(self, offset):
-        text = f'// push {self.name} {offset}\n'
-        text += f'@{self.base + int(offset)}\n'
-        text +=  'D=M\n'
-        text += f'@{SP.value}\n'
-        text +=  'M=D\n'
+        text = f'// push {self.abbr} {offset}\n'
+        text += f'@{offset}\n'
+        text += 'D=A\n'
+        text += f'@{self.base}\n'
+        text += 'A=A+D\n'
+        text += 'D=M\n'
+        text += SP.next_free_pos()
+        text += 'M=D\n'
         text += SP.increment()
         return text
 
-    def pop(self, offset):
-        text = f'// pop {self.name} {offset}\n'
-        text += f'@{SP.value - 1}\n'
+    def pop(self, offset) -> str:
+        text = f'// pop {self.abbr} {offset}\n'
+        text += '// Store offset in Register 13\n'
+        text += f'@{offset}\n'
+        text += 'D=A\n'
+        text += f'@{self.base}\n'
+        text += 'D=A+D\n'
+        text += '@R13\n'
+        text += 'M=D\n'
+        
+        text += '// Save Stack value and use Register 13 to pop to segment\n'
+        text += SP.first_value()
         text += 'D=M\n'
-        text += f'@{self.base + int(offset)}\n'
+        text += '@R13\n'
+        text += 'A=M\n'
         text += 'M=D\n'
         text += SP.decrement()
         return text
@@ -362,7 +349,7 @@ _segment_dict = {
   'argument': Segment('ARG'),
   'this': this_segment,
   'that': that_segment,
-  'temp': TempSegment(),
+  'temp': TempSegment('TEMP'),
   'static': StaticSegment(),
   'pointer': PointerSegment(this_segment, that_segment)
 }
