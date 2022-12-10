@@ -1,6 +1,6 @@
 #!usr/bin/bash
 
-FILENAME=PointerTest
+FILENAME=BasicTest
 
 python -m VMTranslator VMTranslator/$FILENAME.vm
 

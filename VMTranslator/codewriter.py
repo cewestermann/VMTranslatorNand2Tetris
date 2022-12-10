@@ -253,10 +253,10 @@ class Segment:
         return text
 
 
-class TempSegment(Segment):
-    def __init__(self, abbr):
+class SegmentWithBase(Segment):
+    def __init__(self, abbr, base):
         super().__init__(abbr)
-        self.base = 5
+        self.base = base
 
     def push(self, offset):
         text = f'// push {self.abbr} {offset}\n'
@@ -349,32 +349,6 @@ class PointerSegment(Segment):
         text += SP.decrement()
         return text
 
-#class PointerSegment:
-#    def __init__(self, this_segment, that_segment):
-#        self.name = 'pointer'
-#        self.base = 3 # Same as THIS
-#        self.this_segment = this_segment
-#        self.that_segment = that_segment
-#        self.labelcount = 0
-#
-#    def push(self, offset):
-#        text = f'// push {self.name} {offset}\n'
-#        text += f'@{self.base + int(offset)}\n'
-#        text +=  'D=M\n'
-#        text += f'@{SP.value}\n'
-#        text +=  'M=D\n'
-#        text += SP.increment()
-#        return text
-#
-#    def pop(self, offset):
-#        text = f'// pop {self.name} {offset}\n'
-#        text += f'@{SP.value - 1}\n'
-#        text += 'D=M\n'
-#        text += f'@{self.base + int(offset)}\n'
-#        text += 'M=D\n'
-#        text += SP.decrement()
-#        return text
-
 
 # TODO: Not a fan of this way of doing it
 this_segment = Segment('THIS')
@@ -385,9 +359,9 @@ _segment_dict = {
   'argument': Segment('ARG'),
   'this': this_segment,
   'that': that_segment,
-  'temp': TempSegment('TEMP'),
+  'temp': SegmentWithBase('TEMP', 5),
   'static': StaticSegment(),
-  'pointer': PointerSegment('PNTR')
+  'pointer': SegmentWithBase('PNTR', 3)
 }
 
 
