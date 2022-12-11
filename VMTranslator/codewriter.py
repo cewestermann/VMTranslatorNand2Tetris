@@ -14,19 +14,17 @@ def set_filename(filename):
 
 
 class StackPointer:
-    def __init__(self):
-        self.address = 0
-        self.value = 256 # TODO: Should not keep track of the value here
-                         # Should be done exclusively in assembly
     def increment(self):
-        self.value += 1
         comment = '// increment stack pointer\n'
         return comment + f'@SP\nM=M+1\n'
 
     def decrement(self):
-        self.value -= 1
         comment = '// decrement stack pointer\n'
         return comment + f'@SP\nM=M-1\n'
+
+    @staticmethod
+    def get_prev_value():
+        pass
 
     @staticmethod
     def next_free_pos():
@@ -41,9 +39,11 @@ class StackPointer:
         return text
 
     @staticmethod
-    def second_value():
+    def second_value(decremented=False):
         text = '@SP\n'
         text += 'A=M-1\n'
+        if decremented:
+            return text
         text += 'A=A-1\n'
         return text
 
@@ -331,7 +331,8 @@ _segment_dict = {
 def push_constant(offset):
     comment = f'// push constant {offset}\n'
     text = comment + f'@{offset}\nD=A\n'
-    text += f'@{SP.value}\nM=D\n'
+    text += SP.next_free_pos()
+    text += 'M=D\n'
     return text + SP.increment()
 
 
@@ -379,7 +380,7 @@ class CodeWriter:
 
     def _write_if(self, command):
         text = f'// if-goto {command.arg1}\n'
-        text += f'@{SP.value - 1}\n'
+        text += SP.first_value()
         text += 'D=M\n'
         text += SP.decrement() # The value is popped from the stack
         text += f'@global${command.arg1}\n'

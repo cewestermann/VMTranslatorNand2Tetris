@@ -1,10 +1,10 @@
 #!usr/bin/bash
 
-FILENAME=BasicTest
+FILENAME=FibonacciSeries
 
 python -m VMTranslator VMTranslator/$FILENAME.vm
 
-mv ./$FILENAME.asm ./MemoryAccess/$FILENAME/
+mv ./$FILENAME.asm ./ProgramFlow/$FILENAME/
 
 bash ./tools/CPUEmulator.sh
 

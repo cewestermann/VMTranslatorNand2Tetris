@@ -1,15 +1,29 @@
-// push argument 1
-@401
+// push ARG 1
+@1
+D=A
+@ARG
+A=M+D
 D=M
-@256
+@SP
+A=M
 M=D
 // increment stack pointer
 @SP
 M=M+1
-// pop pointer 1
-@256
+// pop PNTR 1
+// Store offset in Register 13
+@1
+D=A
+@3
+D=A+D
+@R13
+M=D
+// Save Stack value and use Register 13 to pop to segment
+@SP
+A=M-1
 D=M
-@4
+@R13
+A=M
 M=D
 // decrement stack pointer
 @SP
@@ -22,10 +36,20 @@ M=D
 // increment stack pointer
 @SP
 M=M+1
-// pop that 0
-@256
+// pop THAT 0
+// Store offset in Register 13
+@0
+D=A
+@THAT
+D=M+D
+@R13
+M=D
+// Save Stack value and use Register 13 to pop to segment
+@SP
+A=M-1
 D=M
-@3010
+@R13
+A=M
 M=D
 // decrement stack pointer
 @SP
@@ -38,18 +62,32 @@ M=D
 // increment stack pointer
 @SP
 M=M+1
-// pop that 1
-@256
+// pop THAT 1
+// Store offset in Register 13
+@1
+D=A
+@THAT
+D=M+D
+@R13
+M=D
+// Save Stack value and use Register 13 to pop to segment
+@SP
+A=M-1
 D=M
-@3011
+@R13
+A=M
 M=D
 // decrement stack pointer
 @SP
 M=M-1
-// push argument 0
-@400
+// push ARG 0
+@0
+D=A
+@ARG
+A=M+D
 D=M
-@256
+@SP
+A=M
 M=D
 // increment stack pointer
 @SP
@@ -63,26 +101,43 @@ M=D
 @SP
 M=M+1
 // sub
-@257
+@SP
+A=M-1
 D=M
-@256
+@SP
+A=M-1
+A=A-1
 M=M-D
 // decrement stack pointer
 @SP
 M=M-1
-// pop argument 0
-@256
+// pop ARG 0
+// Store offset in Register 13
+@0
+D=A
+@ARG
+D=M+D
+@R13
+M=D
+// Save Stack value and use Register 13 to pop to segment
+@SP
+A=M-1
 D=M
-@400
+@R13
+A=M
 M=D
 // decrement stack pointer
 @SP
 M=M-1
 (global$MAIN_LOOP_START)
-// push argument 0
-@400
+// push ARG 0
+@0
+D=A
+@ARG
+A=M+D
 D=M
-@256
+@SP
+A=M
 M=D
 // increment stack pointer
 @SP
@@ -99,42 +154,67 @@ D;JNE
 @END_PROGRAM
 0;JMP
 (global$COMPUTE_ELEMENT)
-// push that 0
-@3010
+// push THAT 0
+@0
+D=A
+@THAT
+A=M+D
 D=M
-@256
+@SP
+A=M
 M=D
 // increment stack pointer
 @SP
 M=M+1
-// push that 1
-@3011
+// push THAT 1
+@1
+D=A
+@THAT
+A=M+D
 D=M
-@257
+@SP
+A=M
 M=D
 // increment stack pointer
 @SP
 M=M+1
 // add
-@257
+@SP
+A=M-1
 D=M
-@256
+@SP
+A=M-1
+A=A-1
 M=D+M
 // decrement stack pointer
 @SP
 M=M-1
-// pop that 2
-@256
+// pop THAT 2
+// Store offset in Register 13
+@2
+D=A
+@THAT
+D=M+D
+@R13
+M=D
+// Save Stack value and use Register 13 to pop to segment
+@SP
+A=M-1
 D=M
-@3012
+@R13
+A=M
 M=D
 // decrement stack pointer
 @SP
 M=M-1
-// push pointer 1
-@4
+// push PNTR 1
+@1
+D=A
+@3
+A=A+D
 D=M
-@256
+@SP
+A=M
 M=D
 // increment stack pointer
 @SP
@@ -148,25 +228,42 @@ M=D
 @SP
 M=M+1
 // add
-@257
+@SP
+A=M-1
 D=M
-@256
+@SP
+A=M-1
+A=A-1
 M=D+M
 // decrement stack pointer
 @SP
 M=M-1
-// pop pointer 1
-@256
+// pop PNTR 1
+// Store offset in Register 13
+@1
+D=A
+@3
+D=A+D
+@R13
+M=D
+// Save Stack value and use Register 13 to pop to segment
+@SP
+A=M-1
 D=M
-@4
+@R13
+A=M
 M=D
 // decrement stack pointer
 @SP
 M=M-1
-// push argument 0
-@400
+// push ARG 0
+@0
+D=A
+@ARG
+A=M+D
 D=M
-@256
+@SP
+A=M
 M=D
 // increment stack pointer
 @SP
@@ -180,17 +277,30 @@ M=D
 @SP
 M=M+1
 // sub
-@257
+@SP
+A=M-1
 D=M
-@256
+@SP
+A=M-1
+A=A-1
 M=M-D
 // decrement stack pointer
 @SP
 M=M-1
-// pop argument 0
-@256
+// pop ARG 0
+// Store offset in Register 13
+@0
+D=A
+@ARG
+D=M+D
+@R13
+M=D
+// Save Stack value and use Register 13 to pop to segment
+@SP
+A=M-1
 D=M
-@400
+@R13
+A=M
 M=D
 // decrement stack pointer
 @SP
