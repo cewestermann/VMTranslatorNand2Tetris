@@ -59,10 +59,6 @@ def decrement_sp_on_call(f):
   return wrapper
 
 
-def _clsvariable(obj):
-    return f'{type(obj).__name__}'
-
-
 class VMCommand: pass
 
 
@@ -218,7 +214,7 @@ class Neg(ArithmeticVMCommand):
 
 
 class Segment:
-    def __init__(self, abbr, base=None):
+    def __init__(self, abbr):
         self.abbr = abbr
 
     def push(self, offset):
